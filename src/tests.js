@@ -52,7 +52,7 @@ console.log(check('Solar to standard time difference (minutes)',
 // Example 1.6.1
 // Angle of incidence of beam radiation on a surface
 // in Madison (WI) (lat=43ºN)
-// at 10.30 (SOT)
+// at 10:30 (SOT)
 // on February 13 (n=44)
 // if the surface is tilted 45º from the horizontal (surfSlope, Beta=45º)
 // and pointed 15º West of south (surfAzimuth = 15º).
@@ -64,9 +64,15 @@ let sa1 = sol.surfAngle(delta1, // delta
                         45, // surfSlope
                         15 // surfAzimuth
                        );
+let hourangle161 = sol.hourAngle(10.5);
+let sunzenith161 = sol.sunZenith(43, delta1, hourangle161);
+let sunazimuth161 = sol.sunAzimuth(43, delta1, hourangle161, sunzenith161);
+let sa2 = sol.surfAngle2(sunzenith161, sunazimuth161, 45, 15);
+
 console.log('* Example 1.6.1');
 console.log(check(`Declination for day ${ nday }`, delta1, -13.95));
 console.log(check('Surface angle (deg)', sa1, 35.16));
+console.log(check('Surface angle (deg)', sa2, 35.16));
 
 // Example 1.6.2a - zenith and solar azimuth
 // latitude = 43º
@@ -121,6 +127,28 @@ console.log(check('Solar altitude (alfa_s)', sunaltitude, 19.67));
 console.log(check('Sun azimuth (gamma_s)', sunazimuth163, 66.76));
 console.log(check('Profile angle (alfa_P)', profileangle163, 25.6));
 
+// Example 1.8.1
+// Ratio for data in example 1.6.1
+// Angle of incidence of beam radiation on a surface
+// in Madison (WI) (lat=43ºN)
+// at 10:30 (SOT) on February 13 (n=44)
+// if the surface is tilted 45º from the horizontal (surfSlope, Beta=45º)
+// and pointed 15º West of south (surfAzimuth = 15º).
+let declination181 = sol.declinationForDay(sol.dayInYear('2001-2-13'));
+let hourangle181 = sol.hourAngle(10.5);
+let sunzenith181 = sol.sunZenith(43, declination181, hourangle181);
+let sunazimuth181 = sol.sunAzimuth(43, declination181, hourangle181, sunzenith181);
+let beamratio181 = sol.beamRatio(sunzenith181, sunazimuth181, 45, 15);
+
+console.log('* Example 1.8.1');
+console.log(check('Beam Ratio (R_b)', beamratio181, 1.67));
+console.log('cos Surfangle: ',
+            Math.cos(sol.TO_RAD
+                     * sol.surfAngle2(sunzenith181, sunazimuth181, 45, 15))
+           );
+
+// Example 1.8.2
+// TODO
 
 // Orientaciones
 const ORIENTATIONS = [

@@ -6,6 +6,8 @@ builddevjs:
 buildjs:
 	$(info [INFO]: Generando bundle JS de producción)
 	npm run buildprod
+test:
+	node src/tests.js
 npminstall:
 	$(info [INFO]: Instalación de nodejs y dependencias JS)
 	curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -

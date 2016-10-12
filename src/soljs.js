@@ -220,6 +220,26 @@ function profileAngle(sunaltitude, sunazimuth, surfazimuth) {
   return atand(tand(sunaltitude) / cosd(sunazimuth - surfazimuth));
 }
 
+// Ratio of beam radiation on tilted surface to that on horizontal surface (R_b)
+//
+// (1.8.1)
+// sunZenith (zeta_z): angle in degrees between the vertical and the line to the sun (angle of incidence of beam radiation on a horizontal surface)
+// sunAzimuth (gamma_s): solar azimuth angle in degrees (angle from south of the horizontal projection of the beam. East of south are negative and west of south are positive)
+// surfSlope (beta): angle between the plane of the surface and the horizontal 0<=beta <=180 (beta>90 means it has a downward facing component)
+// surfAzimuth (gamma): deviation of the projection on a horizontal plane of the normal to the surface from the local meridian, with zero due south, east negative, west positive (-180 <= gamma <= 180).
+function beamRatio(sunzenith, sunazimuth, surfslope, surfazimuth) {
+  return cosd(surfAngle2(sunzenith, sunazimuth, surfslope, surfazimuth))
+    / cosd(sunzenith);
+}
+
+// Ratio of beam radiation on tilted surface facing south to horizontal (R_b_noon)
+//
+// 1.8.4a
+// Valid only for the northern hemisphere
+function beamRatioNoon(latitude, declination, surfslope) {
+  return (cosd(Math.abs(latitude - declination - surfslope)) / cosd(Math.abs(latitude - declination)));
+}
+
 module.exports = { G_SC, TO_RAD, TO_DEG,
                    dayInYear, angleForDay,
                    G_on, EOT, solarToStandardTimeCorrection,
@@ -227,4 +247,6 @@ module.exports = { G_SC, TO_RAD, TO_DEG,
                    surfAngle, surfAngleVert, surfAngle2,
                    sunZenith, sunAzimuth,
                    sunsetHourAngle, numberOfDaylightHours,
-                   profileAngle };
+                   profileAngle,
+                   beamRatio, beamRatioNoon
+                 };
