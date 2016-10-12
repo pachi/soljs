@@ -1,0 +1,8 @@
+node_modules
+bower_components
+dist
+build
+stats.json
+*.log
+*.generated.*
+npm-debug.log
