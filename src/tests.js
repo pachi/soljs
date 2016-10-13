@@ -141,7 +141,7 @@ let sunazimuth181 = sol.sunAzimuth(43, declination181, hourangle181, sunzenith18
 let beamratio181 = sol.beamRatio(sunzenith181, sunazimuth181, 45, 15);
 
 console.log('* Example 1.8.1');
-console.log(check('Beam Ratio (R_b)', beamratio181, 1.67));
+console.log(check('Beam Ratio (R_b)', beamratio181, 1.66));
 console.log('cos Surfangle: ',
             Math.cos(sol.TO_RAD
                      * sol.surfAngle2(sunzenith181, sunazimuth181, 45, 15))
