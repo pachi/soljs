@@ -142,13 +142,35 @@ let beamratio181 = sol.beamRatio(sunzenith181, sunazimuth181, 45, 15);
 
 console.log('* Example 1.8.1');
 console.log(check('Beam Ratio (R_b)', beamratio181, 1.66));
-console.log('cos Surfangle: ',
-            Math.cos(sol.TO_RAD
-                     * sol.surfAngle2(sunzenith181, sunazimuth181, 45, 15))
+console.log(check('Surfangle',
+                  sol.surfAngle2(sunzenith181, sunazimuth181, 45, 15),
+                  35.16)
            );
 
 // Example 1.8.2
-// TODO
+// latitude 40º, tilt 30º, sufazimuth=0
+// 9 to 10h, February 16
+let declination182 = sol.declinationForDay(sol.dayInYear('2001-2-16'));
+let hourangle182 = sol.hourAngle(9.5);
+let sunzenith182 = sol.sunZenith(40, declination182, hourangle182);
+let sunazimuth182 = sol.sunAzimuth(40, declination182, hourangle182, sunzenith182);
+let beamratio182 = sol.beamRatio(sunzenith182, sunazimuth182, 30, 0);
+
+console.log('* Example 1.8.2');
+console.log(check('Beam Ratio (R_b)', beamratio182, 1.61));
+
+// Example 1.8.3
+// latitude 40º, tilt 50º, sufazimuth=0
+// 9 to 10h, February 16
+let beamratio183 = sol.beamRatio(sunzenith182, sunazimuth182, 50, 0);
+
+console.log('* Example 1.8.3');
+console.log(check('Beam Ratio (R_b)', beamratio183, 1.79));
+
+
+
+
+
 
 // Orientaciones
 const ORIENTATIONS = [
