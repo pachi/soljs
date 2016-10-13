@@ -52,19 +52,7 @@ function dayInYear(isodatestring) {
   return Math.floor((now - start) / oneDay);
 }
 
-// ******************* Solar functions **********************
-
-// Day angle, B -> degrees
-// n: day of the year (1<= n <= 365)
-function angleForDay(n) {
-    return (n - 1) * 360 / 365;
-}
-
-// Extraterrestrial radiation on the plane normal to the radiation -> W/m2
-// n: day of the year (1<= n <= 365)
-function G_on(n) {
-    return G_SC * (1 + 0.033 * cosd(angleForDay(n + 1))); // (1.4.1.a)
-}
+// ******************* Solar position functions **********************
 
 // Equation of time -> minutes
 // Spencer(1971) (1.5.3)
@@ -125,13 +113,13 @@ function solarAltitude(sunzenith) {
 // Angle of incidence of the beam radiation on a surface (zeta) -> degrees
 // from declination, latitude and hour data (1.6.2)
 //
-// declination (delta): declination in degrees for day n
 // latitude (phi): latitude in degrees, north positive (-90 <= phi <= 90)
+// declination (delta): declination in degrees for day n
 // hourangle (w): hour angle in degrees
 // surfslope (beta): angle in degrees between the plane of the surface and the horizontal 0<=beta <=180 (beta>90 means it has a downward facing component)
 // surfazimuth (gamma): deviation in degrees of the projection on a horizontal plane of the normal to the surface from the local meridian, with zero due south, east negative, west positive (-180 <= gamma <= 180).
 
-function surfAngle(declination, latitude, hourangle, surfslope, surfazimuth) {
+function surfAngle(latitude, declination, hourangle, surfslope, surfazimuth) {
   return acosd(
     sind(declination) * sind(latitude) * sind(surfslope)
       - sind(declination) * cosd(latitude) * sind(surfslope) * cosd(surfazimuth)
@@ -144,12 +132,12 @@ function surfAngle(declination, latitude, hourangle, surfslope, surfazimuth) {
 // Angle of incidence of the beam radiation on a vertical surface (zeta) -> degrees
 // from declination, latitude and hour data (1.6.4)
 // eq. 1.6.2 with surfSlope beta=90
-// declination (delta): declination in degrees for day n
 // latitude (phi): latitude in degrees, north positive (-90 <= phi <= 90)
+// declination (delta): declination in degrees for day n
 // hourAngle(w): hour angle in degrees
 // surfAzimuth (gamma): deviation in degrees of the projection on a horizontal plane of the normal to the surface from the local meridian, with zero due south, east negative, west positive (-180 <= gamma <= 180).
 
-function surfAngleVert(declination, latitude, hourangle, surfazimuth) {
+function surfAngleVert(latitude, declination, hourangle, surfazimuth) {
   return acosd(
       -1 * sind(declination) * cosd(latitude) * cosd(surfazimuth)
       + cosd(declination) * sind(latitude) * cosd(surfazimuth) * cosd(hourangle)
@@ -240,13 +228,103 @@ function beamRatioNoon(latitude, declination, surfslope) {
   return (cosd(Math.abs(latitude - declination - surfslope)) / cosd(Math.abs(latitude - declination)));
 }
 
+// Table 1.6.1
+// -----------
+// Average days of month, from Klein(1977) - use fon |latitude| <= 66.5º
+//
+// Month      Average date n    declination (delta)
+// ---------- ------------ ---- -------------------
+// January    17           17   -20.9
+// February   16           47   -13.0
+// March      16           75   -2.4
+// April      15           105  9.4
+// May        15           135  18.8
+// June       11           162  23.1
+// July       17           198  21.2
+// August     16           228  13.5
+// September  15           258  2.2
+// October    15           288  -9.6
+// November   14           318  -18.9
+// December   10           344  -23.0
+// ---------- ------------ ---- -------------------
+const MEANDAYS = [17, 47, 75, 105, 135, 162, 198, 228, 258, 288, 318, 344];
+
+// Solar position plot for latitude Xº
+// -------------------------------------------------------
+// X axis - solar azimuth angle (gamma_s)
+// Y axis - solar altitude angle (alpha_s)
+//        - solar zenith (theta_s = 90 - alpha_s)
+// Lines of constant declination
+//        - for mean days of the months (see table 1.6.1)
+// Lines of constant hour angles labeled by hours
+// -------------------------------------------------------
+
+// ************************ Radiation functions ************************
+
+// Day angle, B -> degrees
+// n: day of the year (1<= n <= 365)
+function angleForDay(n) {
+    return (n - 1) * 360 / 365;
+}
+
+// Extraterrestrial radiation on the plane normal to the radiation -> W/m2
+// n: day of the year (1<= n <= 365)
+function G_on(n) {
+    return G_SC * (1 + 0.033 * cosd(angleForDay(n + 1))); // (1.4.1.a)
+}
+
+// Extraterrestrial radiation on an horizontal plane (1.10.1) (1.10.2)
+//
+// latitude (phi)
+// n: day of the year (1<= n <= 365)
+// hour (solar time): [0, 24). Noon is at 12h.
+function G_o(latitude, nday, hour) {
+  const declination = declinationForDay(nday);
+  const hourangle = hourAngle(hour);
+  return G_on(nday) * cosd(sunZenith(latitude, declination, hourangle));
+}
+
+// Daily extraterrestrial radiation on a horizontal surface, H_o -> J/m².day
+//
+function H_o(latitude, nday) {
+  const declination = declinationForDay(nday);
+  const sunsethourangle = sunsetHourAngle(latitude, declination);
+  return 24 * 3600 * G_SC / Math.PI
+    * (1 + 0.033 * cosd(360 * nday / 365))
+    * (cosd(latitude) * cosd(declination) * sind(sunsethourangle)
+       + Math.PI * sunsethourangle / 180 * sind(latitude) * sind(declination));
+}
+
+// Monthly mean daily extraterrestrial radiation H_o_mean -> J/m².day
+// Computed using the mean day of each month
+// nmonth: [1,12]
+function H_o_mean(latitude, nmonth) {
+  const nday = MEANDAYS[nmonth - 1];
+  return H_o(latitude, nday);
+}
+
+// Extraterrestrial radiation on a horizontal plane for an hour period J/m²
+// (1.10.4)
+// XXX: check
+function I_o(latitude, nday, hourstart, hourend) {
+  const declination = declinationForDay(nday);
+  const hangle1 = hourAngle(hourstart);
+  const hangle2 = hourAngle(hourend);
+  return 24 * 3600 * G_SC / Math.PI
+    * (1 + 0.033 * cosd(360 * nday / 365))
+    * (cosd(latitude) * cosd(declination) * (sind(hangle2) - sind(hangle1))
+       + Math.PI * (hangle2 - hangle1) / 180 * sind(latitude) * sind(declination));
+}
+
 module.exports = { G_SC, TO_RAD, TO_DEG,
                    dayInYear, angleForDay,
-                   G_on, EOT, solarToStandardTimeCorrection,
+                   EOT, solarToStandardTimeCorrection,
                    declinationForDay, hourAngle, hourAngleToTime, solarAltitude,
                    surfAngle, surfAngleVert, surfAngle2,
                    sunZenith, sunAzimuth,
                    sunsetHourAngle, numberOfDaylightHours,
                    profileAngle,
-                   beamRatio, beamRatioNoon
+                   beamRatio, beamRatioNoon,
+                   MEANDAYS,
+                   G_on, G_o, H_o, H_o_mean, I_o
                  };

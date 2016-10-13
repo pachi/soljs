@@ -58,8 +58,8 @@ console.log(check('Solar to standard time difference (minutes)',
 // and pointed 15º West of south (surfAzimuth = 15º).
 let nday2 = sol.dayInYear('2001-2-13');
 let delta1 = sol.declinationForDay(nday2);
-let sa1 = sol.surfAngle(delta1, // delta
-                        43, // latitude
+let sa1 = sol.surfAngle(43, // latitude
+                        delta1, // delta
                         sol.hourAngle(10.5), // hourAngle
                         45, // surfSlope
                         15 // surfAzimuth
@@ -167,7 +167,21 @@ let beamratio183 = sol.beamRatio(sunzenith182, sunazimuth182, 50, 0);
 console.log('* Example 1.8.3');
 console.log(check('Beam Ratio (R_b)', beamratio183, 1.79));
 
+// Example 1.10.1
+// latitude 43º
+// April 15
+let nday1101 = sol.dayInYear('2011-4-15');
 
+console.log('* Example 1.10.1');
+console.log(check('Horizontal extraterrestrial radiation (H_o)', sol.H_o(43, nday1101)/1000000, 33.54));
+
+// Example 1.10.2
+// latitude 43º
+// April 15
+// hstart = 10h, hend=11h
+
+console.log('* Example 1.10.2');
+console.log(check('Extraterrestrial radiation on horizontal plane (I_o)', sol.I_o(43, nday1101, 10, 11)/1000000, 3.79));
 
 
 
