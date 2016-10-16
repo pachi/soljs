@@ -367,6 +367,15 @@ function tau_d(taub) {
   return 0.271 - 0.294 * taub;
 }
 
+// TODO:
+
+// 2.12.1a / 2.12.1b
+// Monthly average difuse fraction correlations Hm_d / Hm = f(Km_T)
+// Compute average daily radiation for CTE climates -> Km_T -> Hm_d
+
+
+// 2.14.1 -> 2.12.3 -> R_b,ave
+
 module.exports = { G_SC, TO_RAD, TO_DEG,
                    dayInYear, angleForDay,
                    EOT, solarToStandardTimeCorrection,
