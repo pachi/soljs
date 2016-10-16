@@ -173,7 +173,7 @@ console.log(check('Beam Ratio (R_b)', beamratio183, 1.79));
 let nday1101 = sol.dayInYear('2011-4-15');
 
 console.log('* Example 1.10.1');
-console.log(check('Horizontal extraterrestrial radiation (H_o)', sol.H_o(43, nday1101)/1000000, 33.54));
+console.log(check('Horizontal extraterrestrial radiation (H_o) [MJ/m2]', sol.H_o(43, nday1101)/1e6, 33.54));
 
 // Example 1.10.2
 // latitude 43º
@@ -181,7 +181,7 @@ console.log(check('Horizontal extraterrestrial radiation (H_o)', sol.H_o(43, nda
 // hstart = 10h, hend=11h
 
 console.log('* Example 1.10.2');
-console.log(check('Extraterrestrial radiation on horizontal plane (I_o)', sol.I_o(43, nday1101, 10, 11)/1000000, 3.79));
+console.log(check('Extraterrestrial radiation on horizontal plane (I_o) [MJ/m2]', sol.I_o(43, nday1101, 10, 11)/1e6, 3.77));
 
 
 

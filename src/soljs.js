@@ -306,11 +306,11 @@ function H_o_mean(latitude, nmonth) {
 // Extraterrestrial radiation on a horizontal plane for an hour period J/m²
 // (1.10.4)
 // XXX: check
-function I_o(latitude, nday, hourstart, hourend) {
+function I_o(latitude, nday, starthour, endhour) {
   const declination = declinationForDay(nday);
-  const hangle1 = hourAngle(hourstart);
-  const hangle2 = hourAngle(hourend);
-  return 24 * 3600 * G_SC / Math.PI
+  const hangle1 = hourAngle(starthour);
+  const hangle2 = hourAngle(endhour);
+  return 12 * 3600 * G_SC / Math.PI
     * (1 + 0.033 * cosd(360 * nday / 365))
     * (cosd(latitude) * cosd(declination) * (sind(hangle2) - sind(hangle1))
        + Math.PI * (hangle2 - hangle1) / 180 * sind(latitude) * sind(declination));
