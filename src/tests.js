@@ -173,7 +173,8 @@ console.log(check('Beam Ratio (R_b)', beamratio183, 1.79));
 let nday1101 = sol.dayInYear('2011-4-15');
 
 console.log('* Example 1.10.1');
-console.log(check('Horizontal extraterrestrial radiation (H_o) [MJ/m2]', sol.H_o(43, nday1101)/1e6, 33.54));
+console.log(check('Horizontal extraterrestrial radiation (H_o) [MJ/m2]',
+                  sol.H_o(43, nday1101) / 1e6, 33.54));
 
 // Example 1.10.2
 // latitude 43º
@@ -181,8 +182,51 @@ console.log(check('Horizontal extraterrestrial radiation (H_o) [MJ/m2]', sol.H_o
 // hstart = 10h, hend=11h
 
 console.log('* Example 1.10.2');
-console.log(check('Extraterrestrial radiation on horizontal plane (I_o) [MJ/m2]', sol.I_o(43, nday1101, 10, 11)/1e6, 3.77));
+console.log(check('Extraterrestrial radiation on horizontal plane (I_o) [MJ/m2]',
+                  sol.I_o(43, nday1101, 10, 11) / 1e6, 3.77));
 
+// Example 2.8.1
+// Madison (Wisconsin)
+// altitude 270m -> 0.27km
+// latitude 43º
+// August 22
+// hour = 11:30h (SOT)
+const nday281 = sol.dayInYear('2001-08-22');
+const declination281 = sol.declinationForDay(nday281);
+const hourangle281 = sol.hourAngle(11.5);
+const zenith281 = sol.sunZenith(43, declination281, hourangle281);
+const taub281 = sol.tau_b(zenith281, 0.27);
+const gcb281 = sol.G_cb(43, nday281, 11.5, 0.27);
+
+console.log('* Example 2.8.1');
+console.log(check('Transmittance (beam) of the standard clear atmosphere',
+                  taub281, 0.62));
+console.log(check('Extraterrestrial radiation G_on W/m2',
+                  sol.G_on(nday281), 1338.49));
+console.log(check('Clear-sky normal radiation G_cnb W/m2',
+                  sol.G_cnb(43, nday281, 11.5, 0.27), 830));
+console.log(check('Clear-sky radiation on horizontal plane G_cnb W/m2',
+                  gcb281, 702));
+
+
+// Example 2.8.2
+// Madison (Wisconsin)
+// altitude 270m -> 0.27km
+// latitude 43º
+// August 22
+// hour = 11:30h (SOT)
+const taud282 = sol.tau_d(taub281);
+const go282 = sol.G_o(43, nday281, 11.5);
+const gcd282 = go282 * taud282;
+console.log('* Example 2.8.2');
+console.log(check('Transmittance (diffuse) of the standard clear atmosphere',
+                  taud282, 0.089, 3));
+console.log(check('Extraterrestrial radiation on an horizontal plane [W/m2]',
+                  go282, 1131.85));
+console.log(check('Clear-sky diffuse radiation G_cd [W/m2]',
+                  gcd282, 101.00));
+console.log(check('Clear-sky total radiation on hoirzontal plane G_c = G_cb + G_cd [W/m2]',
+                  gcb281 + gcd282, 803.00));
 
 
 

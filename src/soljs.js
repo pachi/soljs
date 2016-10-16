@@ -316,6 +316,57 @@ function I_o(latitude, nday, starthour, endhour) {
        + Math.PI * (hangle2 - hangle1) / 180 * sind(latitude) * sind(declination));
 }
 
+// Atmospheric transmittance for beam radiation (tau_b) (2.8.1a)
+//
+// zenith: sun zenith angle (degrees)
+// altitude: loation altitude (km)
+// XXX: See correction factors r_i for climate types in table 2.8.1
+//
+// Table 2.8.1 Correction Factors for Climate Types (From Hottel (1976))
+// Climate Type         r0   r1   rk
+// -------------------- ---- ---- ----
+// Tropical             0.95 0.98 1.02
+// Midlatitude summer   0.97 0.99 1.02
+// Subarctic summer     0.99 0.99 1.01
+// Midlatitude winter   1.03 1.01 1.00
+//
+function tau_b(zenith, altitude) {
+  const r0 = 1,
+        r1 = 1,
+        rk = 1;
+  const a0 = r0 * (0.4237 - 0.00821 * Math.pow((6 - altitude), 2));
+  const a1 = r1 * (0.5055 + 0.00595 * Math.pow((6.5 - altitude), 2));
+  const k = rk * (0.2711 + 0.01858 * Math.pow((2.5 - altitude), 2));
+  return a0 + a1 * Math.exp(-k / cosd(zenith));
+}
+
+// Clear-sky normal beam radiation (G_cnb)
+//
+function G_cnb(latitude, nday, hour, altitude) {
+  const declination = declinationForDay(nday);
+  const hourangle = hourAngle(hour);
+  const zenith = sunZenith(latitude, declination, hourangle);
+  return tau_b(zenith, altitude) * G_on(nday);
+}
+
+// Clear-sky horizontal beam radiation (G_cb)
+//
+function G_cb(latitude, nday, hour, altitude) {
+  const declination = declinationForDay(nday);
+  const hourangle = hourAngle(hour);
+  const zenith = sunZenith(latitude, declination, hourangle);
+  return tau_b(zenith, altitude) * G_on(nday) * cosd(zenith);
+}
+
+// Transmission coefficient for diffuse radiation for clear days (tau_d) (2.8.5)
+//
+// Liu and Jordan(1960) tau_d = G_d / G_o = I_d / I_o
+// G_d can be used to get total radiation G_c = G_cb + G_cd
+// taub: transmission coefficient for beam radiation for clear sky
+function tau_d(taub) {
+  return 0.271 - 0.294 * taub;
+}
+
 module.exports = { G_SC, TO_RAD, TO_DEG,
                    dayInYear, angleForDay,
                    EOT, solarToStandardTimeCorrection,
@@ -326,5 +377,7 @@ module.exports = { G_SC, TO_RAD, TO_DEG,
                    profileAngle,
                    beamRatio, beamRatioNoon,
                    MEANDAYS,
-                   G_on, G_o, H_o, H_o_mean, I_o
+                   G_on, G_o, H_o, H_o_mean, I_o,
+                   tau_b, G_cnb, G_cb,
+                   tau_d
                  };
