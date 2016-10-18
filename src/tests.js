@@ -195,18 +195,20 @@ const nday281 = sol.dayInYear('2001-08-22');
 const declination281 = sol.declinationForDay(nday281);
 const hourangle281 = sol.hourAngle(11.5);
 const zenith281 = sol.sunZenith(43, declination281, hourangle281);
-const taub281 = sol.tau_b(zenith281, 0.27);
-const gcb281 = sol.G_cb(43, nday281, 11.5, 0.27);
+const taub281 = sol.tau_b(zenith281, 0.27, 'Midlatitude summer');
+const gon281 = sol.G_on(nday281);
+const gcnb281 = sol.G_cnb(taub281, gon281);
+const gcb281 = sol.G_cb(taub281, gon281, zenith281);
 
 console.log('* Example 2.8.1');
-console.log(check('Transmittance (beam) of the standard clear atmosphere',
+console.log(check('Transmittance (beam) of the standard clear atmosphere (tau_b)',
                   taub281, 0.62));
-console.log(check('Extraterrestrial radiation G_on W/m2',
-                  sol.G_on(nday281), 1338.49));
-console.log(check('Clear-sky normal radiation G_cnb W/m2',
-                  sol.G_cnb(43, nday281, 11.5, 0.27), 830));
-console.log(check('Clear-sky radiation on horizontal plane G_cnb W/m2',
-                  gcb281, 702));
+console.log(check('Extraterrestrial radiation G_on [W/m2]',
+                  gon281, 1338.49));
+console.log(check('Clear-sky normal radiation G_cnb [W/m2]',
+                  gcnb281, 829.58));
+console.log(check('Clear-sky radiation on horizontal plane G_cnb [W/m2]',
+                  gcb281, 701.51));
 
 
 // Example 2.8.2
@@ -216,7 +218,7 @@ console.log(check('Clear-sky radiation on horizontal plane G_cnb W/m2',
 // August 22
 // hour = 11:30h (SOT)
 const taud282 = sol.tau_d(taub281);
-const go282 = sol.G_o(43, nday281, 11.5);
+const go282 = sol.G_o(gon281, zenith281);
 const gcd282 = go282 * taud282;
 console.log('* Example 2.8.2');
 console.log(check('Transmittance (diffuse) of the standard clear atmosphere',
@@ -224,9 +226,9 @@ console.log(check('Transmittance (diffuse) of the standard clear atmosphere',
 console.log(check('Extraterrestrial radiation on an horizontal plane [W/m2]',
                   go282, 1131.85));
 console.log(check('Clear-sky diffuse radiation G_cd [W/m2]',
-                  gcd282, 101.00));
-console.log(check('Clear-sky total radiation on hoirzontal plane G_c = G_cb + G_cd [W/m2]',
-                  gcb281 + gcd282, 803.00));
+                  gcd282, 100.49));
+console.log(check('Clear-sky total radiation on horizontal plane G_c = G_cb + G_cd [W/m2]',
+                  gcb281 + gcd282, 802.00));
 
 
 

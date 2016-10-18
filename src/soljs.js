@@ -276,12 +276,10 @@ function G_on(n) {
 // Extraterrestrial radiation on an horizontal plane (1.10.1) (1.10.2)
 //
 // latitude (phi)
-// n: day of the year (1<= n <= 365)
-// hour (solar time): [0, 24). Noon is at 12h.
-function G_o(latitude, nday, hour) {
-  const declination = declinationForDay(nday);
-  const hourangle = hourAngle(hour);
-  return G_on(nday) * cosd(sunZenith(latitude, declination, hourangle));
+// gon: extraterrestrial radiation on the plane normal to the radiation [W/m2]
+// zenith: sun zenith [degrees].
+function G_o(gon, zenith) {
+  return gon * cosd(zenith);
 }
 
 // Daily extraterrestrial radiation on a horizontal surface, H_o -> J/m².day
@@ -303,7 +301,7 @@ function H_o_mean(latitude, nmonth) {
   return H_o(latitude, nday);
 }
 
-// Extraterrestrial radiation on a horizontal plane for an hour period J/m²
+// Extraterrestrial radiation on a horizontal plane for an hour period -> J/m²
 // (1.10.4)
 // XXX: check
 function I_o(latitude, nday, starthour, endhour) {
@@ -318,6 +316,7 @@ function I_o(latitude, nday, starthour, endhour) {
 
 // Atmospheric transmittance for beam radiation (tau_b) (2.8.1a)
 //
+// tau_b = G_bn / G_on
 // zenith: sun zenith angle (degrees)
 // altitude: loation altitude (km)
 // XXX: See correction factors r_i for climate types in table 2.8.1
@@ -330,32 +329,36 @@ function I_o(latitude, nday, starthour, endhour) {
 // Subarctic summer     0.99 0.99 1.01
 // Midlatitude winter   1.03 1.01 1.00
 //
-function tau_b(zenith, altitude) {
-  const r0 = 1,
-        r1 = 1,
-        rk = 1;
+function tau_b(zenith, altitude, climatetype) {
+  const coefs = { 'Tropical': [0.95, 0.98, 1.02],
+                  'Midlatitude summer': [0.97, 0.99, 1.02],
+                  'Subarctic summer': [0.99, 0.99, 1.01],
+                  'Midlatitude winter': [1.03, 1.01, 1.00]
+                }[climatetype] || [1.00, 1.00, 1.00];
+  const r0 = coefs[0];
+  const r1 = coefs[1];
+  const rk = coefs[2];
+  // const r0 = 1,
+  //       r1 = 1,
+  //       rk = 1;
   const a0 = r0 * (0.4237 - 0.00821 * Math.pow((6 - altitude), 2));
   const a1 = r1 * (0.5055 + 0.00595 * Math.pow((6.5 - altitude), 2));
   const k = rk * (0.2711 + 0.01858 * Math.pow((2.5 - altitude), 2));
   return a0 + a1 * Math.exp(-k / cosd(zenith));
 }
 
-// Clear-sky normal beam radiation (G_cnb)
+// Clear-sky normal beam radiation (G_cnb) -> W/m2
 //
-function G_cnb(latitude, nday, hour, altitude) {
-  const declination = declinationForDay(nday);
-  const hourangle = hourAngle(hour);
-  const zenith = sunZenith(latitude, declination, hourangle);
-  return tau_b(zenith, altitude) * G_on(nday);
+// G_cnb = tau_b * G_on
+function G_cnb(taub, gon) {
+  return taub * gon;
 }
 
-// Clear-sky horizontal beam radiation (G_cb)
+// Clear-sky horizontal beam radiation (G_cb) -> W/m2
 //
-function G_cb(latitude, nday, hour, altitude) {
-  const declination = declinationForDay(nday);
-  const hourangle = hourAngle(hour);
-  const zenith = sunZenith(latitude, declination, hourangle);
-  return tau_b(zenith, altitude) * G_on(nday) * cosd(zenith);
+// G_cb = tau_b * G_on * cos(zenith)
+function G_cb(taub, gon, zenith) {
+  return taub * gon * cosd(zenith);
 }
 
 // Transmission coefficient for diffuse radiation for clear days (tau_d) (2.8.5)
