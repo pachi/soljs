@@ -284,6 +284,9 @@ function G_o(gon, zenith) {
 
 // Daily extraterrestrial radiation on a horizontal surface, H_o -> J/m².day
 //
+// (1.10.3)
+// latitude: latitude [degrees]
+// nday: day of the year [1-365]
 function H_o(latitude, nday) {
   const declination = declinationForDay(nday);
   const sunsethourangle = sunsetHourAngle(latitude, declination);
@@ -294,7 +297,8 @@ function H_o(latitude, nday) {
 }
 
 // Monthly mean daily extraterrestrial radiation H_o_mean -> J/m².day
-// Computed using the mean day of each month
+//
+// Computed using the mean day of each month and (1.10.3)
 // nmonth: [1,12]
 function H_o_mean(latitude, nmonth) {
   const nday = MEANDAYS[nmonth - 1];
@@ -302,12 +306,15 @@ function H_o_mean(latitude, nmonth) {
 }
 
 // Extraterrestrial radiation on a horizontal plane for an hour period -> J/m²
+//
 // (1.10.4)
-// XXX: check
-function I_o(latitude, nday, starthour, endhour) {
+// latitude: latitude [degrees]
+// nday: day of the year [1-365]
+// starthour: XXX: check
+function I_o(latitude, nday, starthour) {
   const declination = declinationForDay(nday);
   const hangle1 = hourAngle(starthour);
-  const hangle2 = hourAngle(endhour);
+  const hangle2 = hourAngle(starthour + 1);
   return 12 * 3600 * G_SC / Math.PI
     * (1 + 0.033 * cosd(360 * nday / 365))
     * (cosd(latitude) * cosd(declination) * (sind(hangle2) - sind(hangle1))

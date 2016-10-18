@@ -183,7 +183,7 @@ console.log(check('Horizontal extraterrestrial radiation (H_o) [MJ/m2]',
 
 console.log('* Example 1.10.2');
 console.log(check('Extraterrestrial radiation on horizontal plane (I_o) [MJ/m2]',
-                  sol.I_o(43, nday1101, 10, 11) / 1e6, 3.77));
+                  sol.I_o(43, nday1101, 10) / 1e6, 3.77));
 
 // Example 2.8.1
 // Madison (Wisconsin)
