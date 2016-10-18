@@ -210,7 +210,6 @@ console.log(check('Clear-sky normal radiation G_cnb [W/m2]',
 console.log(check('Clear-sky radiation on horizontal plane G_cnb [W/m2]',
                   gcb281, 701.51));
 
-
 // Example 2.8.2
 // Madison (Wisconsin)
 // altitude 270m -> 0.27km
@@ -221,7 +220,7 @@ const taud282 = sol.tau_d(taub281);
 const go282 = sol.G_o(gon281, zenith281);
 const gcd282 = go282 * taud282;
 console.log('* Example 2.8.2');
-console.log(check('Transmittance (diffuse) of the standard clear atmosphere',
+console.log(check('Transmittance (diffuse) of the standard clear atmosphere (tau_d)',
                   taud282, 0.089, 3));
 console.log(check('Extraterrestrial radiation on an horizontal plane [W/m2]',
                   go282, 1131.85));

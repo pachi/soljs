@@ -336,18 +336,18 @@ function I_o(latitude, nday, starthour) {
 // Subarctic summer     0.99 0.99 1.01
 // Midlatitude winter   1.03 1.01 1.00
 //
+const HOTTEL_CORR_FACTORS = {
+  'Tropical': [0.95, 0.98, 1.02],
+  'Midlatitude summer': [0.97, 0.99, 1.02],
+  'Subarctic summer': [0.99, 0.99, 1.01],
+  'Midlatitude winter': [1.03, 1.01, 1.00]
+};
+
 function tau_b(zenith, altitude, climatetype) {
-  const coefs = { 'Tropical': [0.95, 0.98, 1.02],
-                  'Midlatitude summer': [0.97, 0.99, 1.02],
-                  'Subarctic summer': [0.99, 0.99, 1.01],
-                  'Midlatitude winter': [1.03, 1.01, 1.00]
-                }[climatetype] || [1.00, 1.00, 1.00];
+  const coefs = HOTTEL_CORR_FACTORS[climatetype] || [1.00, 1.00, 1.00];
   const r0 = coefs[0];
   const r1 = coefs[1];
   const rk = coefs[2];
-  // const r0 = 1,
-  //       r1 = 1,
-  //       rk = 1;
   const a0 = r0 * (0.4237 - 0.00821 * Math.pow((6 - altitude), 2));
   const a1 = r1 * (0.5055 + 0.00595 * Math.pow((6.5 - altitude), 2));
   const k = rk * (0.2711 + 0.01858 * Math.pow((2.5 - altitude), 2));
