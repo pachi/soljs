@@ -377,11 +377,43 @@ function tau_d(taub) {
   return 0.271 - 0.294 * taub;
 }
 
+// Monthly average clearness index K_T_mean (2.9.1)
+//
+// Ratio of monthly average daily radiation on a horizontal surface to
+// the monthly average extraterrestrial radiation
+// h_mean: monthly average daily total solar radiation on a horizontal surface W/m2
+// h_0_mean: average daily extraterrestrial radiation W/m2
+function K_T_mean(h_mean, h_o_mean) {
+  return h_mean / h_o_mean;
+}
+
+// Daily clearness index K_T (2.9.2)
+//
+// Ratio of a particular day's radiation on a horizontal surface to
+// the extraterrestrial radiation for that day
+// h: total solar radiation on a horizontal surface for the day W/m2
+// h_0: extraterrestrial radiation for the day W/m2
+function K_T(h, h_o) {
+  return h / h_o;
+}
+
+// Hourly clearness index k_T (2.9.3)
+//
+// Ratio of a particular hour's radiation on a horizontal surface to
+// the extraterrestrial radiation for that hour
+// i: total solar radiation on a horizontal surface for the hour W/m2
+// i_0: extraterrestrial radiation for the hour W/m2
+function k_T(i, i_o) {
+  return i / i_o;
+}
+
+
+
 // TODO:
 
 // 2.12.1a / 2.12.1b
 // Monthly average difuse fraction correlations Hm_d / Hm = f(Km_T)
-// Compute average daily radiation for CTE climates -> Km_T -> Hm_d
+// Compute average daily radiation for CTE climates -> K_T_mean -> Hm_d
 
 
 // 2.14.1 -> 2.12.3 -> R_b,ave
@@ -398,5 +430,6 @@ module.exports = { G_SC, TO_RAD, TO_DEG,
                    MEANDAYS,
                    G_on, G_o, H_o, H_o_mean, I_o,
                    tau_b, G_cnb, G_cb,
-                   tau_d
+                   tau_d,
+                   K_T_mean, K_T, k_T
                  };
