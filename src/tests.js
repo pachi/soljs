@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 const sol = require('./soljs.js');
+const _ = require('lodash');
 
 // *********************** Examples **************************
 function check(msg, value, expected, precision) {
@@ -216,19 +217,54 @@ console.log(check('Clear-sky radiation on horizontal plane G_cnb [W/m2]',
 // latitude 43º
 // August 22
 // hour = 11:30h (SOT)
-const taud282 = sol.tau_d(taub281);
-const go282 = sol.G_o(gon281, zenith281);
+const declination282 = declination281;
+const zenith282 = zenith281;
+const taub282 = taub281;
+const taud282 = sol.tau_d(taub282);
+const go282 = sol.G_o(gon281, zenith282);
+const gcb282 = gcb281;
 const gcd282 = go282 * taud282;
 console.log('* Example 2.8.2');
 console.log(check('Transmittance (diffuse) of the standard clear atmosphere (tau_d)',
                   taud282, 0.089, 3));
-console.log(check('Extraterrestrial radiation on an horizontal plane [W/m2]',
+console.log(check('Extraterrestrial radiation on an horizontal plane G_o [W/m2]',
                   go282, 1131.85));
 console.log(check('Clear-sky diffuse radiation G_cd [W/m2]',
                   gcd282, 100.49));
 console.log(check('Clear-sky total radiation on horizontal plane G_c = G_cb + G_cd [W/m2]',
-                  gcb281 + gcd282, 802.00));
+                  gcb282 + gcd282, 802.00));
 
+const Wh2MJ = 3600 * 1e-6;
+
+console.log("Hora \t taub \t Icbn \t Icb \t taud \t Icd \t Ic");
+_.range(0.5, 24.5)
+  .map(h => {
+    let hangle = sol.hourAngle(h);
+    return [h, sol.sunZenith(43, declination282, hangle)];
+  })
+  .filter(data => {
+    let zenith = data[1];
+    return zenith <= 90;
+  }) // sun over the horizon
+  .map(data => {
+    let h = data[0],
+        zenith = data[1];
+    let taub = sol.tau_b(zenith, 0.27, 'Midlatitude summer');
+    let gon = sol.G_on(nday281);
+    let gcbn = sol.G_cnb(taub, gon);
+    let gcb = sol.G_cb(taub, gon, zenith);
+    let taud = sol.tau_d(taub);
+    let go = sol.G_o(gon, zenith);
+    let gcd = go * taud;
+
+    console.log(`${ h } \t ${ taub.toFixed(3) } \t ` +
+                `${ (gcbn * Wh2MJ).toFixed(2) } \t ` +
+                `${ (gcb * Wh2MJ).toFixed(2) } \t ` +
+                `${ taud.toFixed(3) } \t ` +
+                `${ (gcd * Wh2MJ).toFixed(2) } \t ` +
+                `${ ((gcb + gcd) * Wh2MJ).toFixed(2) } \t `
+               );
+});
 
 
 // Orientaciones
