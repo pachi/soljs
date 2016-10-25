@@ -266,6 +266,53 @@ _.range(0.5, 24.5)
                );
 });
 
+// Example 2.11.1
+// St. Louis, Missouri
+// latitude 38.6º
+// September 3
+// H = 23.0 MJ
+const nday2111 = sol.dayInYear('2001-9-3');
+const declination2111 = sol.declinationForDay(nday2111);
+const sunsethourangle2111 = sol.sunsetHourAngle(38.6, declination2111);
+const ho2111 = sol.H_o(38.6, nday2111);
+const KT2111 = 23 * 1e6 / ho2111;
+const Id2I2111 = sol.daily_Id_to_I(KT2111, sunsethourangle2111);
+console.log('* Example 2.11.1');
+console.log(check('Declination for September 3 (delta)',
+                  declination2111, 7, 0));
+console.log(check('Sunset hour angle for St.Louis and September 3 (ws)',
+                  sunsethourangle2111, 95.9, 1));
+console.log(check('Daily extraterrestrial radiation on an horizontal plane H_o [MJ/m2]',
+                  ho2111 * 1e-6, 33.5, 1));
+console.log(check('Daily clearness index K_T (H/H_o)',
+                  KT2111, 0.69, 2));
+console.log(check('Daily diffuse to total radiation ratio',
+                  Id2I2111, 0.26, 2));
+console.log(check('Day\'s diffuse energy',
+                  Id2I2111 * 23.0, 6.0, 1));
+
+// Example 2.12.1
+// Madison, Wisconsin
+// latitude 43º
+// June average daily radiation = 23 MJ/m2
+const nday2121 = sol.dayInYear('2001-6-11');
+const declination2121 = sol.declinationForDay(nday2121);
+const sunsethourangle2121 = sol.sunsetHourAngle(43, declination2121);
+const ho2121 = sol.H_o(43, nday2121);
+const KT2121 = 23 * 1e6 / ho2121;
+const Id2I2121 = sol.monthly_Id_to_I(KT2121, sunsethourangle2121);
+console.log('* Example 2.12.1');
+console.log(check('Declination for June 11 (delta)',
+                  declination2121, 23.0, 1));
+console.log(check('Sunset hour angle for Madison and June 11 (ws)',
+                  sunsethourangle2121, 113.3, 1));
+console.log(check('Daily extraterrestrial radiation on an horizontal plane H_o [MJ/m2]',
+                  ho2121 * 1e-6, 41.7, 1));
+console.log(check('Monthly average daily clearness index K_T_mean (H_mean/H_o_mean)',
+                  KT2121, 0.55, 2));
+console.log(check('Daily diffuse to total radiation ratio',
+                  Id2I2121, 0.38, 2));
+
 
 // Orientaciones
 const ORIENTATIONS = [
