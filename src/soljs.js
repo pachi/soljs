@@ -293,7 +293,7 @@ function H_o(latitude, nday) {
   return 24 * 3600 * G_SC / Math.PI
     * (1 + 0.033 * cosd(360 * nday / 365))
     * (cosd(latitude) * cosd(declination) * sind(sunsethourangle)
-       + Math.PI * sunsethourangle / 180 * sind(latitude) * sind(declination));
+       + TO_RAD * sunsethourangle * sind(latitude) * sind(declination));
 }
 
 // Monthly mean daily extraterrestrial radiation H_o_mean -> J/m².day
