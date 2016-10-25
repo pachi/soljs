@@ -451,7 +451,7 @@ function daily_Id_to_I(KT, ws) {
   } else {
     if (KT < 0.722) {
       Id_to_I = 1.0
-        - 0.2832 * KT
+        + 0.2832 * KT
         - 2.5557 * Math.pow(KT, 2)
         + 0.8448 * Math.pow(KT, 3);
     } else {
