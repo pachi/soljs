@@ -29,7 +29,7 @@ const Wh2MJ = sol.Wh2MJ;
 
 // *********************** Examples **************************
 function check(msg, value, expected, precision) {
-  const prec = precision | 2;
+  const prec = precision !== undefined ? precision : 2;
   const isok = value.toFixed(prec) === expected.toFixed(prec);
   const res = isok ? ' ok' : ' error (' + expected.toFixed(prec) + ')';
   return `${ msg } = ${ value.toFixed(prec) } ${ res }`;
