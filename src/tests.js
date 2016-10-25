@@ -25,6 +25,8 @@ SOFTWARE.
 const sol = require('./soljs.js');
 const _ = require('lodash');
 
+const Wh2MJ = sol.Wh2MJ;
+
 // *********************** Examples **************************
 function check(msg, value, expected, precision) {
   const prec = precision | 2;
@@ -233,8 +235,6 @@ console.log(check('Clear-sky diffuse radiation G_cd [W/m2]',
                   gcd282, 100.49));
 console.log(check('Clear-sky total radiation on horizontal plane G_c = G_cb + G_cd [W/m2]',
                   gcb282 + gcd282, 802.00));
-
-const Wh2MJ = 3600 * 1e-6;
 
 console.log("Hora \t taub \t Icbn \t Icb \t taud \t Icd \t Ic");
 _.range(0.5, 24.5)

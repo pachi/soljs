@@ -34,6 +34,7 @@ Implementation based on formulas from:
 const G_SC = 1367.0; // Solar constant, W/m2
 const TO_RAD = Math.PI / 180; // Degrees to radians conversion factor
 const TO_DEG = 180 / Math.PI; // Radians to degrees conversion factor
+const Wh2MJ = 3600 * 1e-6; // Wh to MJ conversion factor
 
 // ***************** General utility functions ****************
 
@@ -518,7 +519,7 @@ function CTE_KTmean(ZCV, canarias) {
 // TODO
 // 2.14.1 -> 2.12.3 -> R_b,ave
 
-module.exports = { G_SC, TO_RAD, TO_DEG,
+module.exports = { G_SC, TO_RAD, TO_DEG, Wh2MJ,
                    dayInYear, angleForDay,
                    EOT, solarToStandardTimeCorrection,
                    declinationForDay, hourAngle, hourAngleToTime, solarAltitude,
