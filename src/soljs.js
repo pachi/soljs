@@ -407,15 +407,115 @@ function k_T(i, i_o) {
   return i / i_o;
 }
 
+// Hourly diffuse to total radiation on a horizontal plane ratio,
+// from the hourly clearness index k_T (2.10.1)
+// Correlation from Erbs et al. (1982)
+//
+// kT: hourly clearness index (I/I_o)
+function hourly_Id_to_I(kT) {
+  let Id_to_I = 0.0;
+  if (kT <= 0.22) {
+    Id_to_I = 1.0
+      - 0.09 * kT;
+  } else if (kT <= 0.80) {
+    Id_to_I = 0.9511
+      - 0.1604 * kT
+      + 4.3880 * Math.pow(kT, 2)
+      - 16.638 * Math.pow(kT, 3)
+      + 12.336 * Math.pow(kT, 4);
+  } else {
+    Id_to_I = 0.165;
+  }
+  return Id_to_I;
+}
 
+// Daily diffuse to total radiation on a horizontal plane ratio,
+// from the daily clearness index K_T (2.11.1)
+// Correlation from Erbs et al. (1982)
+//
+// KT: daily clearness index (H/H_o)
+// ws: sunset hour angle [degrees]
+function daily_Id_to_I(KT, ws) {
+  let Id_to_I = 0.0;
+  if (ws <= 81.4) {
+    if (KT < 0.715) {
+      Id_to_I = 1.0
+        - 0.27270 * KT
+        + 2.44950 * Math.pow(KT, 2)
+        - 11.9514 * Math.pow(KT, 3)
+        + 9.38970 * Math.pow(KT, 4);
+    } else {
+      Id_to_I = 0.143;
+    }
+  } else {
+    if (KT < 0.722) {
+      Id_to_I = 1.0
+        - 0.2832 * KT
+        - 2.5557 * Math.pow(KT, 2)
+        + 0.8448 * Math.pow(KT, 3);
+    } else {
+      Id_to_I = 0.175;
+    }
+  }
+  return Id_to_I;
+}
 
-// TODO:
+// Monthly average daily diffuse to total radiation on a horizontal plane ratio,
+// from the daily clearness index K_T (2.12.1)
+// Correlation from Erbs et al. (1982)
+//
+// KTmean: monthly average daily clearness index (H_mean/H_o_mean)
+// ws: sunset hour angle [degrees]
+function monthly_Id_to_I(KTmean, ws) {
+  if (KTmean < 0.3 || KTmean > 0.8) return null;
+  let Id_to_I = 0.0;
+  if (ws <= 81.4) {
+    Id_to_I = 1.391
+      - 3.560 * KTmean
+      + 4.189 * Math.pow(KTmean, 2)
+      - 2.137 * Math.pow(KTmean, 3);
+  } else {
+    Id_to_I = 1.311
+      - 3.022 * KTmean
+      + 3.427 * Math.pow(KTmean, 2)
+      - 1.821 * Math.pow(KTmean, 3);
+  }
+  return Id_to_I;
+}
 
-// 2.12.1a / 2.12.1b
-// Monthly average difuse fraction correlations Hm_d / Hm = f(Km_T)
-// Compute average daily radiation for CTE climates -> K_T_mean -> Hm_d
+// Monthly average daily clearness index (KTmean = H_mean/H_o_mean)
+// Computed from CTE standard climates
+CTE_KTmean(ZCV, canarias) {
+  let KTmean = 1.0;
+  if (canarias === true) {
+    if ZCV === '1' {
+      KTmean = 0.531;
+    } else if (ZCV === '2') {
+      KTmean = 0.591;
+    } else if (ZCV === '3') {
+      KTmean = 0.605;
+    } else if (ZCV === '4') {
+      KTmean = 0.645;
+    } else {
+      KTmean = null;
+    }
+  } else {
+    if ZCV === '1' {
+      KTmean = 0.555;
+    } else if (ZCV === '2') {
+      KTmean = 0.618;
+    } else if (ZCV === '3') {
+      KTmean = 0.632;
+    } else if (ZCV === '4') {
+      KTmean = 0.675;
+    } else {
+      KTmean = null;
+    }
+  }
+  return KTmean;
+}
 
-
+// TODO
 // 2.14.1 -> 2.12.3 -> R_b,ave
 
 module.exports = { G_SC, TO_RAD, TO_DEG,
@@ -431,5 +531,7 @@ module.exports = { G_SC, TO_RAD, TO_DEG,
                    G_on, G_o, H_o, H_o_mean, I_o,
                    tau_b, G_cnb, G_cb,
                    tau_d,
-                   K_T_mean, K_T, k_T
+                   K_T_mean, K_T, k_T,
+                   hourly_Id_to_I, daily_Id_to_I, monthly_Id_to_I,
+                   CTE_KTmean
                  };
