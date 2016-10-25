@@ -484,6 +484,14 @@ function monthly_Id_to_I(KTmean, ws) {
   return Id_to_I;
 }
 
+// TODO: Hourly radiation from daily data (2.13)
+// skip
+
+
+// TODO: Radiation on sloped surfaces
+// 2.14.1 -> 2.12.3 -> R_b,ave
+
+
 // Monthly average daily clearness index (KTmean = H_mean/H_o_mean)
 // Computed from CTE standard climates
 function CTE_KTmean(ZCV, canarias) {
@@ -515,9 +523,6 @@ function CTE_KTmean(ZCV, canarias) {
   }
   return KTmean;
 }
-
-// TODO
-// 2.14.1 -> 2.12.3 -> R_b,ave
 
 module.exports = { G_SC, TO_RAD, TO_DEG, Wh2MJ,
                    dayInYear, angleForDay,

@@ -313,6 +313,7 @@ console.log(check('Monthly average daily clearness index K_T_mean (H_mean/H_o_me
 console.log(check('Daily diffuse to total radiation ratio',
                   Id2I2121, 0.38, 2));
 
+// Skip tests 2.13.1, 2.13.2, 2.13.3 on estimation of hourly radiation from daily data
 
 // Orientaciones
 const ORIENTATIONS = [
