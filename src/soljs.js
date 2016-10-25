@@ -485,10 +485,10 @@ function monthly_Id_to_I(KTmean, ws) {
 
 // Monthly average daily clearness index (KTmean = H_mean/H_o_mean)
 // Computed from CTE standard climates
-CTE_KTmean(ZCV, canarias) {
+function CTE_KTmean(ZCV, canarias) {
   let KTmean = 1.0;
   if (canarias === true) {
-    if ZCV === '1' {
+    if (ZCV === '1') {
       KTmean = 0.531;
     } else if (ZCV === '2') {
       KTmean = 0.591;
@@ -500,7 +500,7 @@ CTE_KTmean(ZCV, canarias) {
       KTmean = null;
     }
   } else {
-    if ZCV === '1' {
+    if (ZCV === '1') {
       KTmean = 0.555;
     } else if (ZCV === '2') {
       KTmean = 0.618;
