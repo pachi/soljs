@@ -123,7 +123,7 @@ console.log(check('Declination for 2000-3-15', declination163, -2.42));
 console.log(check('Sunrise hour angle', -sunsethourangle163, -87.74));
 console.log(check('Sunset hour angle', sunsethourangle163, 87.74));
 console.log(check('Sunrise time', sol.hourAngleToTime(-sunsethourangle163), 6.15));
-console.log(check('Sunset time', sol.hourAngleToTime(sunsethourangle163), 17.81));
+console.log(check('Sunset time', sol.hourAngleToTime(sunsethourangle163), 17.85));
 console.log(check('Hour angle (w) at 16h', hourangle163, 60));
 console.log(check('Sun zenith (theta_s)', sunzenith, 70.33));
 console.log(check('Solar altitude (alfa_s)', sunaltitude, 19.67));
