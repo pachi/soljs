@@ -36,6 +36,27 @@ const TO_RAD = Math.PI / 180; // Degrees to radians conversion factor
 const TO_DEG = 180 / Math.PI; // Radians to degrees conversion factor
 const Wh2MJ = 3600 * 1e-6; // Wh to MJ conversion factor
 
+// Table 1.6.1
+// -----------
+// Average days of month, from Klein(1977) - use fon |latitude| <= 66.5º
+//
+// Month      Average date n    declination (delta)
+// ---------- ------------ ---- -------------------
+// January    17           17   -20.9
+// February   16           47   -13.0
+// March      16           75   -2.4
+// April      15           105  9.4
+// May        15           135  18.8
+// June       11           162  23.1
+// July       17           198  21.2
+// August     16           228  13.5
+// September  15           258  2.2
+// October    15           288  -9.6
+// November   14           318  -18.9
+// December   10           344  -23.0
+// ---------- ------------ ---- -------------------
+const MEANDAYS = [17, 47, 75, 105, 135, 162, 198, 228, 258, 288, 318, 344];
+
 // ***************** General utility functions ****************
 
 function sind(angle) { return Math.sin(TO_RAD * angle); }
@@ -51,6 +72,11 @@ function dayInYear(isodatestring) {
   const start = new Date(now.getFullYear(), 0, 0);
   const oneDay = 1000 * 60 * 60 * 24; // miliseconds in day
   return Math.floor((now - start) / oneDay);
+}
+
+// Get mean day number [1-365/366] for Month [1-12]
+function meanDayInYearForMonth(monthnumber) {
+    return MEANDAYS[monthnumber];
 }
 
 // ******************* Solar position functions **********************
@@ -229,27 +255,6 @@ function beamRatioNoon(latitude, declination, surfslope) {
   return (cosd(Math.abs(latitude - declination - surfslope)) / cosd(Math.abs(latitude - declination)));
 }
 
-// Table 1.6.1
-// -----------
-// Average days of month, from Klein(1977) - use fon |latitude| <= 66.5º
-//
-// Month      Average date n    declination (delta)
-// ---------- ------------ ---- -------------------
-// January    17           17   -20.9
-// February   16           47   -13.0
-// March      16           75   -2.4
-// April      15           105  9.4
-// May        15           135  18.8
-// June       11           162  23.1
-// July       17           198  21.2
-// August     16           228  13.5
-// September  15           258  2.2
-// October    15           288  -9.6
-// November   14           318  -18.9
-// December   10           344  -23.0
-// ---------- ------------ ---- -------------------
-const MEANDAYS = [17, 47, 75, 105, 135, 162, 198, 228, 258, 288, 318, 344];
-
 // Solar position plot for latitude Xº
 // -------------------------------------------------------
 // X axis - solar azimuth angle (gamma_s)
@@ -302,7 +307,7 @@ function H_o(latitude, nday) {
 // Computed using the mean day of each month and (1.10.3)
 // nmonth: [1,12]
 function H_o_mean(latitude, nmonth) {
-  const nday = MEANDAYS[nmonth - 1];
+  const nday = meanDayInYearForMonth(nmonth - 1);
   return H_o(latitude, nday);
 }
 
@@ -524,8 +529,8 @@ function CTE_KTmean(ZCV, canarias) {
   return KTmean;
 }
 
-module.exports = { G_SC, TO_RAD, TO_DEG, Wh2MJ,
-                   dayInYear, angleForDay,
+module.exports = { G_SC, TO_RAD, TO_DEG, Wh2MJ, MEANDAYS,
+                   dayInYear, meanDayInYearForMonth, angleForDay,
                    EOT, solarToStandardTimeCorrection,
                    declinationForDay, hourAngle, hourAngleToTime, solarAltitude,
                    surfAngle, surfAngleVert, surfAngle2,
@@ -533,7 +538,6 @@ module.exports = { G_SC, TO_RAD, TO_DEG, Wh2MJ,
                    sunsetHourAngle, numberOfDaylightHours,
                    profileAngle,
                    beamRatio, beamRatioNoon,
-                   MEANDAYS,
                    G_on, G_o, H_o, H_o_mean, I_o,
                    tau_b, G_cnb, G_cb,
                    tau_d,
