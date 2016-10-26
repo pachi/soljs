@@ -315,6 +315,17 @@ console.log(check('Daily diffuse to total radiation ratio',
 
 // Skip tests 2.13.1, 2.13.2, 2.13.3 on estimation of hourly radiation from daily data
 
+
+console.log('* CTE 1');
+console.log(check('Sunset hour angle for CTE_LATPENINSULA and July 17 (ws) [deg]',
+                  sol.CTE_WSPENINSULA, 109.5, 1));
+console.log(check('Daily diffuse to total radiation ratio H_d_mean / H_mean (ZC1, Peninsula)',
+                  sol.monthly_Id_to_I(sol.CTE_KTmean('1', false), sol.CTE_WSPENINSULA), 0.38, 2));
+console.log(check('Sunset hour angle for CTE_LATCANARIAS and July 17 (ws) [deg]',
+                  sol.CTE_WSCANARIAS, 102.0, 1));
+console.log(check('Daily diffuse to total radiation ratio H_d_mean/H_mean (ZC1, Canarias)',
+                  sol.monthly_Id_to_I(sol.CTE_KTmean('1', true), sol.CTE_WSCANARIAS), 0.38, 2));
+
 // Orientaciones
 const ORIENTATIONS = [
   // Area, slope, azimuth, name
