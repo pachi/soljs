@@ -497,6 +497,43 @@ function monthly_Id_to_I(KTmean, ws) {
 // 2.14.1 -> 2.12.3 -> R_b,ave
 // Average radiation on sloped surfaces: 2.19, 2.20, 2.20.5a
 
+// R_mean = H_T_mean / H_mean
+//
+// Ratio of monthly average daily total radiation on tilted surface to monthly
+// average daily total radiation on horizontal plane
+//
+// ws - sunset hour angle (deg)
+function R_mean(beta, surfazimuth, nday, latitude, ws, h_d_mean, h_mean, reflectance_ground) {
+  const declination = declinationForDay(nday);
+  const a = 0.409 + 0.5016 * sind(ws - 60); // (2.13.2b)
+  const b = 0.6609 - 0.4767 * sind(ws - 60); // (2.13.2c)
+  const d = sind(ws) - TO_RAD * ws * cosd(ws);
+  const A = cosd(beta)
+        + tand(latitude) * cosd(surfazimuth) * sind(beta); // 2.20.5.g
+  const B = cosd(ws) * cosd(beta)
+        + tand(declination) * sind(beta) * cosd(surfazimuth); // 2.20.5h
+  const C = sind(beta) * sind(surfazimuth) / cosd(latitude); // 2.20.5i
+
+  const wsr_abs = Math.min(ws, acosd((A * B + C * Math.sqrt(A * A - B * B + C * C)) / (A * A + C * C)));
+  const wsr = ((A > 0 && B > 0) || (A >= B)) ? -wsr_abs : wsr_abs;
+
+  const wss_abs = Math.min(ws, acosd((A * B - C * Math.sqrt(A * A - B * B + C * C)) / (A * A + C * C)));
+  const wss = ((A > 0 && B > 0) || (A >= B)) ? wss_abs : -wss_abs;
+
+  const a1 = a - h_d_mean / h_mean;
+
+  const Gsssr = 0; // TODO 2.20.5c
+  const Gsssneg = 0; // TODO
+  const Gssr = 0; // TODO
+
+  const D = (wss >= wsr) ? Math.max(0, Gsssr) : Math.max(0, Gsssneg + Gssr);
+
+  return D
+    + h_d_mean / h_mean * (1 + cosd(beta) / 2)
+    + reflectance_ground * (1 - cosd(beta) / 2);  // 2.20.5a
+}
+
+
 // ************************ CTE weather data *********************************
 
 // Monthly average daily clearness index (KTmean = H_mean/H_o_mean)
