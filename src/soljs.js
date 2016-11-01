@@ -489,12 +489,20 @@ function monthly_Id_to_I(KTmean, ws) {
   return Id_to_I;
 }
 
-// TODO: Hourly radiation from daily data (2.13)
-// skip
+// SKIP: Hourly radiation from daily data (2.13)
 
-
-// TODO: Radiation on sloped surfaces
+// SKIP: Radiation on sloped surfaces (2.14)
 // 2.14.1 -> 2.12.3 -> R_b,ave
+// I_T = I_b·R_b + I_d,iso·F_c-s + I_d,cs·R_b + I_d,hz·F_c-hz + I·gamma_g·F_c-g (2.14.3)
+// R = I_T / I (2.14.4)
+
+// Radiation on sloped surfaces: isotropic sky (2.15.1)
+// I_T = I_b·R_b + I_d·(1 + cos beta) / 2 + I·gamma_g·(1 - cos beta) / 2
+function ITisotropic(Ib, Id, sunzenith, sunazimuth, surfslope, surfazimuth, gammag) {
+  const Rb = beamRatio(sunzenith, sunazimuth, surfslope, surfazimuth);
+  return Ib * Rb + Id * (1 + cosd(surfslope)) / 2 + (Ib + Id) * gammag * (1 - cosd(surfslope)) / 2;
+}
+
 // Average radiation on sloped surfaces: 2.19, 2.20, 2.20.5a
 
 // R_mean = H_T_mean / H_mean
@@ -568,7 +576,7 @@ function CTE_KTmean(ZCV, canarias) {
   return KTmean;
 }
 
-const CTE_LATPENINSULA =  40.7;
+const CTE_LATPENINSULA = 40.7;
 const CTE_LATCANARIAS = 28.3;
 
 // Latitude for location ('peninsula' or 'canarias')
