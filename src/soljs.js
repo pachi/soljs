@@ -148,7 +148,7 @@ function solarAltitude(sunzenith) {
 
 function surfAngle(latitude, declination, hourangle, surfslope, surfazimuth) {
   return acosd(
-    sind(declination) * sind(latitude) * sind(surfslope)
+    sind(declination) * sind(latitude) * cosd(surfslope)
       - sind(declination) * cosd(latitude) * sind(surfslope) * cosd(surfazimuth)
       + cosd(declination) * cosd(latitude) * cosd(surfslope) * cosd(hourangle)
       + cosd(declination) * sind(latitude) * sind(surfslope) * cosd(surfazimuth) * cosd(hourangle)
