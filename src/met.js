@@ -47,7 +47,6 @@ Línea 2: campos con datos de localización:
 */
 
 const fs = require('fs'); //import * as fs from 'fs';
-const path = require('path'); //import * as path from 'path';
 
 // Compute primary energy (weighted energy) from data in filename
 function readmetfile(metpath) {
@@ -79,5 +78,6 @@ function readmetfile(metpath) {
   return { meta, data };
 }
 
-//const D3path = path.resolve(__dirname, 'zonaD3.met');
-//console.log(readmetfile(D3path));
+// ************************* Exports *****************************************
+
+module.exports = { readmetfile };

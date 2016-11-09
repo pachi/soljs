@@ -21,9 +21,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+const path = require('path');
+const _ = require('lodash');
 const sol = require('./soljscte.js');
 const met = require('./met.js');
-const _ = require('lodash');
 
 const Wh2MJ = sol.Wh2MJ;
 
@@ -42,6 +43,9 @@ const declination = sol.declination(nday);
 console.log('* Ejemplo CTE');
 console.log(check('Declinación para 11 junio (delta)',
                   declination, 23.0, 1));
+
+const D3path = path.resolve(__dirname, 'zonaD3.met');
+console.log(met.readmetfile(D3path));
 
 // Orientaciones
 const ORIENTATIONS = [
