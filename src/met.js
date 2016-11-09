@@ -23,6 +23,29 @@ SOFTWARE.
 Author(s): Rafael Villar Burke <pachi@rvburke.com>
 */
 
+/* MET format
+Linea 1: nombre de archivo de clima. e.g. zonaD3.met
+Línea 2: campos con datos de localización:
+- latitud, grados
+- longitud, grados
+- altitud, metros
+- longitud de referencia, grados
+
+8760 líneas siguientes: campos con datos meteorológicos
+- Día (1 a 31);
+- Hora (1 a 24);
+- Temperatura seca ( ◦ C);
+- Temperatura efectiva del cielo ( ◦ C);
+- Irradiancia solar directa sobre una superficie horizontal (W/m 2 );
+- Irradiancia solar difusa sobre una superficie horizontal (W/m 2 );
+- Humedad específica (kgH2O/kgaire seco);
+- Humedad relativa ( %);
+- Velocidad del viento (m/s);
+- Dirección del viento (grados respecto al norte, E+, O-);
+- Azimut solar (grados);
+- Cénit solar (grados).
+*/
+
 const fs = require('fs'); //import * as fs from 'fs';
 const path = require('path'); //import * as path from 'path';
 
@@ -33,9 +56,9 @@ function readmetfile(metpath) {
         .map(line => line.trim());
   // metadata
   const metname = datalines[0];
-  const [latitude, longitude, altref, longref] = datalines[1]
+  const [latitude, longitude, altitud, longref] = datalines[1]
         .split(' ').map(parseFloat);
-  const meta = { metname, latitude, longitude, altref, longref };
+  const meta = { metname, latitude, longitude, altitud, longref };
   // datalines
   let data = datalines.slice(2).map(x => x.split(/[\s,]+/).map(parseFloat));
   data = data.map(([ mes, dia, hora,
@@ -56,6 +79,5 @@ function readmetfile(metpath) {
   return { meta, data };
 }
 
-const D3path = path.resolve(__dirname, 'zonaD3.met');
-
-console.log(readmetfile(D3path));
+//const D3path = path.resolve(__dirname, 'zonaD3.met');
+//console.log(readmetfile(D3path));
