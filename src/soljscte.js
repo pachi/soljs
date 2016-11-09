@@ -110,7 +110,7 @@ function tsol(nhour, nday, tz, wlong) {
 // Solar hour angle -> degrees [-180, 180]
 //
 // eqs. (10)
-// tsol: solar time (hours)
+// tsol: solar time (hours) [1, 24]
 function hourangle(tsol) {
   let w = (12.5 - tsol) * 180 / 12;
   w = (w > 180) ? w - 360 : w;
@@ -254,7 +254,7 @@ function iext(nday) {
 
 // clearness parameter (epsilon), adimensional eq.(30)
 // gsolbeam: solar direct (beam) radiation, W/m2
-// gsoldiff: solar diffuese radiation on an horizontal plane, W/m2
+// gsoldiff: solar diffuse radiation on an horizontal plane, W/m2
 // salt: solar altitude, degrees
 function getclearness(gsolbeam, gsoldiff, salt) {
   if (gsoldiff < 0.01) return 999;
@@ -288,7 +288,7 @@ function getbrightnesscoefficients(clearness) {
 // eqs. (28)-(34)
 // nday: day of the year (1<= n <= 366)
 // gsolbeam: solar direct (beam) radiation, W/m2
-// gsoldiff: solar diffuese radiation on an horizontal plane, W/m2
+// gsoldiff: solar diffuse radiation on an horizontal plane, W/m2
 // salt: solar altitude, degrees
 // sangle: solar angle of incidence on the inclined surface, degrees (function sangleforsurf)
 // beta: surface tilt angle, degrees [0, 180]
@@ -312,7 +312,7 @@ function idif(nday, gsolbeam, gsoldiff, salt, sangle, beta) {
 // eqs. (35)
 //
 // gsolbeam: solar direct (beam) radiation, W/m2
-// gsoldiff: solar diffuese radiation on an horizontal plane, W/m2
+// gsoldiff: solar diffuse radiation on an horizontal plane, W/m2
 // salt: solar altitude, degrees
 // beta: surface tilt angle, degrees [0, 180]
 // albedo: solar reflectivity of the ground [0.0, 1.0]
@@ -325,7 +325,7 @@ function idifgrnd(gsolbeam, gsoldiff, salt, beta, albedo) {
 // eqs. (36)
 // nday: day of the year (1<= n <= 366)
 // gsolbeam: solar direct (beam) radiation, W/m2
-// gsoldiff: solar diffuese radiation on an horizontal plane, W/m2
+// gsoldiff: solar diffuse radiation on an horizontal plane, W/m2
 // salt: solar altitude, degrees
 // sangle: solar angle of incidence on the inclined surface, degrees (function sangleforsurf)
 function icircum(nday, gsolbeam, gsoldiff, salt, sangle) {
@@ -342,32 +342,78 @@ function icircum(nday, gsolbeam, gsoldiff, salt, sangle) {
 // Total direct solar irradiance -> W/m2
 //
 // eqs. (37)
-// idir: direct irradiance on the inclined surface, W/m2
-// icircum: circumsolar irradiance, W/m2
-function idirtot(idir, icircum) {
-  return idir + icircum;
+// month: month of the year [1, 12]
+// day: day of the month [1, 31]
+// hour: solar hour [1, 24]
+// gsolbeam: solar direct (beam) radiation (G_sol;b), W/m2
+// gsoldiff: solar diffuse radiation on an horizontal plane, W/m2
+// saltitude: solar altitude, degrees
+// wlat: latitude of the weather station, degrees [-90, +90]
+// beta: surface tilt angle, degrees [0, 180]
+// gamma: surface orientation (deviation from south, E+, W-), degrees [-180, 180]
+function idirtot(month, day, hour, gsolbeam, gsoldiff, saltitude,
+                 wlat, beta, gamma) {
+  const nday = ndayfromdate(`2001-${ month }-${ day }`);
+  const delta = declination(nday);
+  const hangle = hourangle(hour);
+  const sangle = sangleforsurf(delta, hangle, saltitude, wlat, beta, gamma);
+  // idir: direct irradiance on the inclined surface, W/m2
+  // icircum: circumsolar irradiance, W/m2
+  return (idir(gsolbeam, sangle)
+          + icircum(nday, gsolbeam, gsoldiff, saltitude, sangle)
+         );
 }
 
 // Total diffuse solar irradiance -> W/m2
 //
 // eqs. (38)
-// idif: diffuse irradiance on the inclined surface, W/m2
-// icircum: circumsolar irradiance, W/m2
-// idifgrnd: irradiance on the inclined surface by ground reflection, W/m2
-function idiftot(idif, icircum, idifgrnd) {
-  return idif - icircum - idifgrnd;
+// month: month of the year [1, 12]
+// day: day of the month [1, 31]
+// hour: solar hour [1, 24]
+// gsolbeam: solar direct (beam) radiation (G_sol;b), W/m2
+// gsoldiff: solar diffuse radiation on an horizontal plane, W/m2
+// saltitude: solar altitude, degrees
+// wlat: latitude of the weather station, degrees [-90, +90]
+// beta: surface tilt angle, degrees [0, 180]
+// gamma: surface orientation (deviation from south, E+, W-), degrees [-180, 180]
+// albedo: solar reflectivity of the ground [0.0, 1.0]
+function idiftot(month, day, hour, gsolbeam, gsoldiff, saltitude,
+                 wlat, beta, gamma, albedo) {
+  const nday = ndayfromdate(`2001-${ month }-${ day }`);
+  const delta = declination(nday);
+  const hangle = hourangle(hour);
+  const sangle = sangleforsurf(delta, hangle, saltitude, wlat, beta, gamma);
+  // idif: diffuse irradiance on the inclined surface, W/m2
+  // icircum: circumsolar irradiance, W/m2
+  // idifgrnd: irradiance on the inclined surface by ground reflection, W/m2
+  return (idif(nday, gsolbeam, gsoldiff, saltitude, sangle, beta)
+          - icircum(nday, gsolbeam, gsoldiff, saltitude, sangle)
+          - idifgrnd(gsolbeam, gsoldiff, saltitude, beta, albedo)
+         );
 }
 
 // Total solar irradiance -> W/m2
 //
 // eqs. (39)
-// idirtot: total direct solar irradiance, W/m2
-// idiftot: total diffuse solar irradiance, W/m2
-function itot(idirtot, idiftot) {
-  return idirtot + idiftot;
+// month: month of the year [1, 12]
+// day: day of the month [1, 31]
+// hour: solar hour [1, 24]
+// gsolbeam: solar direct (beam) radiation (G_sol;b), W/m2
+// gsoldiff: solar diffuse radiation on an horizontal plane, W/m2
+// saltitude: solar altitude, degrees
+// wlat: latitude of the weather station, degrees [-90, +90]
+// beta: surface tilt angle, degrees [0, 180]
+// gamma: surface orientation (deviation from south, E+, W-), degrees [-180, 180]
+// albedo: solar reflectivity of the ground [0.0, 1.0]
+function itot(month, day, hour, gsolbeam, gsoldiff, saltitude,
+              wlat, beta, gamma, albedo) {
+  return (
+    idirtot(month, day, hour, gsolbeam, gsoldiff, saltitude,
+            wlat, beta, gamma)
+      + idiftot(month, day, hour, gsolbeam, gsoldiff, saltitude,
+                wlat, beta, gamma, albedo)
+  );
 }
-
-
 
 // ************************ CTE weather data *********************************
 

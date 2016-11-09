@@ -47,16 +47,36 @@ console.log(check('Declinación para 11 junio (delta)',
 const D3path = path.resolve(__dirname, 'zonaD3.met');
 const D3data = met.readmetfile(D3path);
 console.log(D3data.meta);
-const julydata = D3data.data
-      .filter(e => e.mes === 7)
-      .filter(e => e.rdifhor !== 0)
-      .map(({ mes, dia, hora,
-              rdirhor, rdifhor,
-              azimut, cenit }) => ({ mes, dia, hora,
-                                     rdirhor, rdifhor,
-                                     azimut, cenit })
-          );
-console.log(julydata);
+
+let julydata = D3data.data
+    .filter(e => e.mes === 7)
+    .filter(e => e.rdifhor !== 0)
+    .map(({ mes, dia, hora,
+            rdirhor, rdifhor,
+            azimut, cenit }
+         ) => (
+           { mes, dia, hora,
+             rdirhor, rdifhor,
+             azimut, cenit }
+         )
+        );
+julydata = julydata
+  .map(e => {
+    e.salt = 90 - e.cenit;
+    e.latitud = D3data.meta.latitude;
+    e.rdir = sol.gsolb(e.rdirhor, e.salt);
+    return e;
+  });
+
+testday = julydata[10];
+
+console.log(testday);
+
+// sol.idirtot(month, day, hour, gsolbeam, gsoldiff, saltitude,
+//             wlat, beta, gamma);
+// sol.idiftot(month, day, hour, gsolbeam, gsoldiff, saltitude,
+//             wlat, beta, gamma, albedo);
+
 
 // Orientaciones
 const ORIENTATIONS = [
