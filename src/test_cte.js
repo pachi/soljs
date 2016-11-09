@@ -45,7 +45,18 @@ console.log(check('Declinación para 11 junio (delta)',
                   declination, 23.0, 1));
 
 const D3path = path.resolve(__dirname, 'zonaD3.met');
-console.log(met.readmetfile(D3path));
+const D3data = met.readmetfile(D3path);
+console.log(D3data.meta);
+const julydata = D3data.data
+      .filter(e => e.mes === 7)
+      .filter(e => e.rdifhor !== 0)
+      .map(({ mes, dia, hora,
+              rdirhor, rdifhor,
+              azimut, cenit }) => ({ mes, dia, hora,
+                                     rdirhor, rdifhor,
+                                     azimut, cenit })
+          );
+console.log(julydata);
 
 // Orientaciones
 const ORIENTATIONS = [
