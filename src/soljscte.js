@@ -265,22 +265,36 @@ function getclearness(gsolbeam, gsoldiff, salt) {
 
 // Brightness coefficients (table 9)
 function getbrightnesscoefficients(clearness) {
-  if (clearness < 1.065) return { f11: -0.008, f12: 0.588, f13: -0.062,
-                                  f21: -0.060, f22: 0.072, f23: -0.022 };
-  if (clearness < 1.230) return  { f11: 0.130, f12: 0.683, f13: -0.151,
-                                   f21: -0.019, f22: 0.066, f23: -0.029 };
-  if (clearness < 1.500) return  { f11: 0.330, f12: 0.487, f13: -0.221,
-                                   f21: 0.055, f22: -0.064, f23: -0.026 };
-  if (clearness < 1.950) return  { f11: 0.568, f12: 0.187, f13: -0.295,
-                                   f21: 0.109, f22: -0.152, f23: -0.014 };
-  if (clearness < 2.280) return  { f11: 0.873, f12: -0.392, f13: -0.362,
-                                   f21: 0.226, f22: -0.462, f23: 0.001 };
-  if (clearness < 4.500) return  { f11: 1.132, f12: -1.237, f13: -0.412,
-                                   f21: 0.288, f22: -0.823, f23: 0.056 };
-  if (clearness < 6.200) return  { f11: 1.060, f12: -1.600, f13: -0.359,
-                                   f21: 0.264, f22: -1.127, f23: 0.131 };
-  return  { f11: 0.678, f12: -0.327, f13: -0.250,
-            f21: 0.156, f22: -1.377, f23: 0.251 };
+  if (clearness < 1.065) {
+    return { f11: -0.008, f12: 0.588, f13: -0.062,
+             f21: -0.060, f22: 0.072, f23: -0.022 };
+  }
+  if (clearness < 1.230) {
+    return { f11: 0.130, f12: 0.683, f13: -0.151,
+             f21: -0.019, f22: 0.066, f23: -0.029 };
+  }
+  if (clearness < 1.500) {
+    return { f11: 0.330, f12: 0.487, f13: -0.221,
+             f21: 0.055, f22: -0.064, f23: -0.026 };
+  }
+  if (clearness < 1.950) {
+    return { f11: 0.568, f12: 0.187, f13: -0.295,
+             f21: 0.109, f22: -0.152, f23: -0.014 };
+  }
+  if (clearness < 2.280) {
+    return { f11: 0.873, f12: -0.392, f13: -0.362,
+             f21: 0.226, f22: -0.462, f23: 0.001 };
+  }
+  if (clearness < 4.500) {
+    return { f11: 1.132, f12: -1.237, f13: -0.412,
+             f21: 0.288, f22: -0.823, f23: 0.056 };
+  }
+  if (clearness < 6.200) {
+    return { f11: 1.060, f12: -1.600, f13: -0.359,
+             f21: 0.264, f22: -1.127, f23: 0.131 };
+  }
+  return { f11: 0.678, f12: -0.327, f13: -0.250,
+           f21: 0.156, f22: -1.377, f23: 0.251 };
 }
 
 // Diffuse irradiance (without ground reflection) -> W/m2
