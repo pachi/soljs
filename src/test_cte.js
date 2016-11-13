@@ -28,7 +28,12 @@ const met = require('./met.js');
 
 const Wh2MJ = sol.Wh2MJ;
 
+// *********************** Aux functions *********************
 
+function climadata(metfile) {
+  const datapath = path.resolve(__dirname, metfile);
+  return met.readmetfile(datapath);
+}
 
 
 // *********************** Examples **************************
@@ -39,38 +44,47 @@ function check(msg, value, expected, precision) {
   return `${ msg } = ${ value.toFixed(prec) } ${ res }`;
 }
 
-// Ejemplo
+// Ejemplo 1
 const nday = sol.ndayfromdate('2001-6-11');
 const declination = sol.declination(nday);
 
-console.log('* Ejemplo CTE');
+console.log('* Ejemplo CTE 1');
 console.log(check('Declinación para 11 junio (delta)',
                   declination, 23.0, 1));
 
-const D3path = path.resolve(__dirname, 'zonaD3.met');
-const D3data = met.readmetfile(D3path);
-console.log(D3data.meta);
-const meta = D3data.meta;
+// Ejemplo 2
+const data = climadata('zonaD3.met');
 
-let julydata = D3data.data
+let julydata = data.data
     .filter(e => e.mes === 7)
     .filter(e => e.rdifhor !== 0)
-    .map(({ mes, dia, hora,
-            rdirhor, rdifhor,
-            azimut, cenit }
-         ) => (
-           { mes, dia, hora,
-             rdirhor, rdifhor,
-             azimut, cenit }
-         )
-        );
-julydata = julydata
-  .map(e => {
-    e.salt = 90 - e.cenit;
-    e.latitud = D3data.meta.latitude;
-    e.rdir = sol.gsolbeam(e.rdirhor, e.salt);
-    return e;
-  });
+    .map(
+      ({ mes, dia, hora, rdirhor, rdifhor, azimut, cenit }
+      ) => ({ mes, dia, hora, rdirhor, rdifhor, azimut, cenit }));
+julydata = julydata.map(e => {
+  e.salt = 90 - e.cenit;
+  e.latitud = data.meta.latitude;
+  e.rdir = sol.gsolbeam(e.rdirhor, e.salt);
+  return e;
+});
+
+let d = julydata[6];
+const surf = { Area: 1.0, beta: 0, gamma: 0, name: 'Horiz.' };
+const albedo = 0.2;
+let idirtot = sol.idirtot(d.mes, d.dia, d.hora, d.rdir, d.rdifhor, d.salt,
+                          d.latitud, surf.beta, surf.gamma);
+let idiftot = sol.idiftot(d.mes, d.dia, d.hora, d.rdir, d.rdifhor, d.salt,
+                          d.latitud, surf.beta, surf.gamma, albedo);
+
+
+console.log('* Ejemplo CTE 2');
+console.log(d);
+console.log(data.meta);
+console.log("Resultados para hora: ", d, " y superficie: ", surf);
+console.log(check('Irradiación directa + difusa horiz. (Mod. Pérez)',
+                  idirtot + idiftot, d.rdirhor + d.rdifhor, 1));
+
+// Ejemplo 3
 
 // Orientaciones
 const ORIENTATIONS = [
@@ -86,20 +100,11 @@ const ORIENTATIONS = [
   { Area: 1.0, beta: 90, gamma: 180, name: 'N' }
 ];
 
-let d = julydata[6];
-const surf = ORIENTATIONS[0];
-const albedo = 0.2;
+console.log('* Ejemplo CTE 3');
+console.log(check('Declinación para 11 junio (delta)',
+                  declination, 23.0, 1));
 
-console.log(d);
-console.log(meta);
-console.log("Results for data: ", d, " and surface: ", surf);
-
-let idirtot = sol.idirtot(d.mes, d.dia, d.hora, d.rdir, d.rdifhor, d.salt,
-                          d.latitud, surf.beta, surf.gamma);
-let idiftot = sol.idiftot(d.mes, d.dia, d.hora, d.rdir, d.rdifhor, d.salt,
-                          d.latitud, surf.beta, surf.gamma, albedo);
-console.log('directa horiz: ', d.rdirhor, '->', idirtot);
-console.log('difusa horiz : ', d.rdifhor, '->', idiftot);
+// TODO
 
 
 // Ejemplo huecos para A_sol_ver
@@ -111,4 +116,4 @@ const huecos = [
   [1, 2.5 * 1.5, 90, 0, 0.1]
 ];
 
-console.log(sol.sangleforsurf(-14, -22.5, 43, 45, 15));
+// TODO
