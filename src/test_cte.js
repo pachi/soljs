@@ -28,6 +28,9 @@ const met = require('./met.js');
 
 const Wh2MJ = sol.Wh2MJ;
 
+
+
+
 // *********************** Examples **************************
 function check(msg, value, expected, precision) {
   const prec = precision !== undefined ? precision : 2;
@@ -47,6 +50,7 @@ console.log(check('Declinación para 11 junio (delta)',
 const D3path = path.resolve(__dirname, 'zonaD3.met');
 const D3data = met.readmetfile(D3path);
 console.log(D3data.meta);
+const meta = D3data.meta;
 
 let julydata = D3data.data
     .filter(e => e.mes === 7)
@@ -64,33 +68,38 @@ julydata = julydata
   .map(e => {
     e.salt = 90 - e.cenit;
     e.latitud = D3data.meta.latitude;
-    e.rdir = sol.gsolb(e.rdirhor, e.salt);
+    e.rdir = sol.gsolbeam(e.rdirhor, e.salt);
     return e;
   });
-
-testday = julydata[10];
-
-console.log(testday);
-
-// sol.idirtot(month, day, hour, gsolbeam, gsoldiff, saltitude,
-//             wlat, beta, gamma);
-// sol.idiftot(month, day, hour, gsolbeam, gsoldiff, saltitude,
-//             wlat, beta, gamma, albedo);
-
 
 // Orientaciones
 const ORIENTATIONS = [
   // Area, slope, azimuth, name
-  [1.0, 0, 0, '-'], // horizontal
-  [1.0, 90, -135, 'NE'],
-  [1.0, 90, -90, 'E'],
-  [1.0, 90, -45, 'SE'],
-  [1.0, 90, 0, 'S'],
-  [1.0, 90, 45, 'SW'],
-  [1.0, 90, 90, 'W'],
-  [1.0, 90, 135, 'NW'],
-  [1.0, 90, 180, 'N']
+  { Area: 1.0, beta: 0, gamma: 0, name: 'Horiz.' }, // horizontal
+  { Area: 1.0, beta: 90, gamma: -135, name: 'NE' },
+  { Area: 1.0, beta: 90, gamma: -90, name: 'E' },
+  { Area: 1.0, beta: 90, gamma: -45, name: 'SE' },
+  { Area: 1.0, beta: 90, gamma: 0, name: 'S' },
+  { Area: 1.0, beta: 90, gamma: 45, name: 'SW' },
+  { Area: 1.0, beta: 90, gamma: 90, name: 'W' },
+  { Area: 1.0, beta: 90, gamma: 135, name: 'NW' },
+  { Area: 1.0, beta: 90, gamma: 180, name: 'N' }
 ];
+
+let d = julydata[6];
+const surf = ORIENTATIONS[0];
+const albedo = 0.2;
+
+console.log(d);
+console.log(meta);
+console.log("Results for data: ", d, " and surface: ", surf);
+
+let idirtot = sol.idirtot(d.mes, d.dia, d.hora, d.rdir, d.rdifhor, d.salt,
+                          d.latitud, surf.beta, surf.gamma);
+let idiftot = sol.idiftot(d.mes, d.dia, d.hora, d.rdir, d.rdifhor, d.salt,
+                          d.latitud, surf.beta, surf.gamma, albedo);
+console.log('directa horiz: ', d.rdirhor, '->', idirtot);
+console.log('difusa horiz : ', d.rdifhor, '->', idiftot);
 
 
 // Ejemplo huecos para A_sol_ver
@@ -101,3 +110,5 @@ const huecos = [
   [2, 2.3 * 1.0, 90, 0, 0.1],
   [1, 2.5 * 1.5, 90, 0, 0.1]
 ];
+
+console.log(sol.sangleforsurf(-14, -22.5, 43, 45, 15));
