@@ -40,10 +40,10 @@ const Wh2MJ = 3600 * 1e-6; // Wh to MJ conversion factor
 
 function sind(angle) { return Math.sin(TO_RAD * angle); }
 function cosd(angle) { return Math.cos(TO_RAD * angle); }
-function tand(angle) { return Math.tan(TO_RAD * angle); }
+//function tand(angle) { return Math.tan(TO_RAD * angle); }
 function asind(rsin) { return TO_DEG * Math.asin(rsin); }
 function acosd(rcos) { return TO_DEG * Math.acos(rcos); }
-function atand(rtan) { return TO_DEG * Math.atan(rtan); }
+//function atand(rtan) { return TO_DEG * Math.atan(rtan); }
 
 // Number of day for given date [1, 365/366]
 // isodatestring: date string in iso format, e.g. "2016-12-23"
@@ -126,7 +126,7 @@ function hourangle(tsol) {
 // wlat: latitude of the weather station, degrees [-90, +90]
 function saltitude(delta, hangle, wlat) {
   let alt = asind(sind(delta) * sind(wlat) + cosd(delta) * cosd(wlat) * cosd(hangle));
-  return (alt < 0.0001) ? 0: alt;
+  return (alt < 0.0001) ? 0 : alt;
 }
 
 // solar altitude from zenith -> degrees
