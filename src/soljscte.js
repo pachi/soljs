@@ -165,23 +165,23 @@ function sazimuth(delta, hangle, salt, wlat) {
 // Solar angle of incidence of inclined surface, degrees
 //
 // angle of the solar beam on an inclined surface, degrees, eqs. (17)
+// (1.6.2)
 // delta: solar declination for day (degrees)
 // hangle: hour angle for hour (degrees)
-// salt: solar altitude (degrees)
 // wlat: latitude of the weather station (degrees)
 // beta: surface tilt angle, degrees [0, 180]
 // gamma: surface orientation (deviation from south, E+, W-), degrees [-180, 180]
-function sangleforsurf(delta, hangle, salt, wlat, beta, gamma) {
+function sangleforsurf(delta, hangle, wlat, beta, gamma) {
   const sd = sind(delta);
   const cd = cosd(delta);
+  const sh = sind(hangle);
+  const ch = cosd(hangle);
   const sw = sind(wlat);
   const cw = cosd(wlat);
   const sb = sind(beta);
   const cb = cosd(beta);
   const sg = sind(gamma);
   const cg = cosd(gamma);
-  const sh = sind(hangle);
-  const ch = sind(hangle);
   return acosd(sd * sw * cb
                - sd * cw * sb * cg
                + cd * cw * cb * ch
