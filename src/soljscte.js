@@ -377,7 +377,7 @@ function idirtot(month, day, hour, gsolbeam, gsoldiff, saltitude,
   const idirval = idir(gsolbeam, sangle);
   const icircumval = icircum(nday, gsolbeam, gsoldiff, saltitude, sangle);
   const idirtotval = idirval + icircumval;
-  console.log('idirtot: ', idirtotval, 'idir: ', idirval, 'icircum: ', icircumval);
+  //console.log('idirtot: ', idirtotval, 'idir: ', idirval, 'icircum: ', icircumval);
   return idirtotval;
 }
 
@@ -407,7 +407,7 @@ function idiftot(month, day, hour, gsolbeam, gsoldiff, saltitude,
   const icircumval = icircum(nday, gsolbeam, gsoldiff, saltitude, sangle);
   const idifgrndval = idifgrnd(gsolbeam, gsoldiff, saltitude, beta, albedo);
   const idiftotval = idifval - icircumval - idifgrndval;
-  console.log('idiftot: ', idiftotval, 'idif: ', idifval, 'icircum: ', icircumval, 'idifgrnd: ', idifgrndval);
+  //console.log('idiftot: ', idiftotval, 'idif: ', idifval, 'icircum: ', icircumval, 'idifgrnd: ', idifgrndval);
   return idiftotval;
 }
 
