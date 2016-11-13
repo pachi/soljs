@@ -84,6 +84,8 @@ console.log("Resultados para hora: ", d, " y superficie: ", surf);
 console.log(check('Irradiación directa + difusa horiz. (Mod. Pérez)',
                   idirtot + idiftot, d.rdirhor + d.rdifhor, 1));
 
+// TODO: sumar datos para todo el mes y calcular la media diaria mensual
+
 // Ejemplo 3
 
 // Orientaciones
