@@ -229,7 +229,7 @@ function airmass(salt) {
 // Solar direct (beam) radiation (G_sol;b) from solar direct radiation on an horizontal surface (G_sol;hor) -> W/m2
 // gsolhor: solar direct irradiance on an horizontal plane, W/m2
 // salt: solar altitude, degrees
-function gsolb(gsolhor, salt) {
+function gsolbeam(gsolhor, salt) {
   return gsolhor / sind(salt);
 }
 
@@ -370,12 +370,15 @@ function idirtot(month, day, hour, gsolbeam, gsoldiff, saltitude,
   const nday = ndayfromdate(`2001-${ month }-${ day }`);
   const delta = declination(nday);
   const hangle = hourangle(hour);
-  const sangle = sangleforsurf(delta, hangle, saltitude, wlat, beta, gamma);
+  // sangle: surface incidence angle
+  const sangle = sangleforsurf(delta, hangle, wlat, beta, gamma);
   // idir: direct irradiance on the inclined surface, W/m2
   // icircum: circumsolar irradiance, W/m2
-  return (idir(gsolbeam, sangle)
-          + icircum(nday, gsolbeam, gsoldiff, saltitude, sangle)
-         );
+  const idirval = idir(gsolbeam, sangle);
+  const icircumval = icircum(nday, gsolbeam, gsoldiff, saltitude, sangle);
+  const idirtotval = idirval + icircumval;
+  console.log('idirtot: ', idirtotval, 'idir: ', idirval, 'icircum: ', icircumval);
+  return idirtotval;
 }
 
 // Total diffuse solar irradiance -> W/m2
@@ -396,14 +399,16 @@ function idiftot(month, day, hour, gsolbeam, gsoldiff, saltitude,
   const nday = ndayfromdate(`2001-${ month }-${ day }`);
   const delta = declination(nday);
   const hangle = hourangle(hour);
-  const sangle = sangleforsurf(delta, hangle, saltitude, wlat, beta, gamma);
+  const sangle = sangleforsurf(delta, hangle, wlat, beta, gamma);
   // idif: diffuse irradiance on the inclined surface, W/m2
   // icircum: circumsolar irradiance, W/m2
   // idifgrnd: irradiance on the inclined surface by ground reflection, W/m2
-  return (idif(nday, gsolbeam, gsoldiff, saltitude, sangle, beta)
-          - icircum(nday, gsolbeam, gsoldiff, saltitude, sangle)
-          - idifgrnd(gsolbeam, gsoldiff, saltitude, beta, albedo)
-         );
+  const idifval = idif(nday, gsolbeam, gsoldiff, saltitude, sangle, beta);
+  const icircumval = icircum(nday, gsolbeam, gsoldiff, saltitude, sangle);
+  const idifgrndval = idifgrnd(gsolbeam, gsoldiff, saltitude, beta, albedo);
+  const idiftotval = idifval - icircumval - idifgrndval;
+  console.log('idiftot: ', idiftotval, 'idif: ', idifval, 'icircum: ', icircumval, 'idifgrnd: ', idifgrndval);
+  return idiftotval;
 }
 
 // Total solar irradiance -> W/m2
@@ -446,7 +451,7 @@ function CTE_latitude(location) {
 module.exports = { G_SC, TO_RAD, TO_DEG, Wh2MJ,
                    ndayfromdate, declination, teq, tshift, tsol, hourangle,
                    saltitude, saltfromzenith, szenithfromalt, sazimuth,
-                   sangleforsurf, sgammaforsurf, sbetaforsurf, airmass, gsolb,
+                   sangleforsurf, sgammaforsurf, sbetaforsurf, airmass, gsolbeam,
                    idir, iext, idif, idifgrnd, icircum, idirtot, idiftot, itot,
                    getclearness, getbrightnesscoefficients,
                    CTE_latitude, CTE_LATPENINSULA, CTE_LATCANARIAS
