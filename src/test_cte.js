@@ -30,11 +30,11 @@ const Wh2MJ = sol.Wh2MJ;
 
 // *********************** Aux functions *********************
 
+// Lee datos climáticos desde archivo .met
 function climadata(metfile) {
   const datapath = path.resolve(__dirname, metfile);
   return met.readmetfile(datapath);
 }
-
 
 // *********************** Examples **************************
 function check(msg, value, expected, precision) {
@@ -48,48 +48,46 @@ function check(msg, value, expected, precision) {
 const nday = sol.ndayfromdate('2001-6-11');
 const declination = sol.declination(nday);
 
-console.log('* Ejemplo CTE 1');
+console.log('* Test CTE 1');
 console.log(check('Declinación para 11 junio (delta)',
                   declination, 23.0, 1));
 
 // Ejemplo 2
-const data = climadata('zonaD3.met');
+let data = climadata('zonaD3.met');
 
-let julydata = data.data
-    .filter(e => e.mes === 7)
-    .filter(e => e.rdifhor !== 0)
-    .map(
-      ({ mes, dia, hora, rdirhor, rdifhor, azimut, cenit }
-      ) => ({ mes, dia, hora, rdirhor, rdifhor, azimut, cenit }));
-julydata = julydata.map(e => {
-  e.salt = 90 - e.cenit;
-  e.latitud = data.meta.latitude;
-  e.rdir = sol.gsolbeam(e.rdirhor, e.salt);
-  return e;
-});
-
-let d = julydata[6];
-const surf = { Area: 1.0, beta: 0, gamma: 0, name: 'Horiz.' };
-const albedo = 0.2;
+let july_data = met.prepareData(data).filter(d => d.mes === 7);
+let surf = { Area: 1.0, beta: 0, gamma: 0, name: 'Horiz.' };
+let albedo = 0.2;
+let d = july_data[6];
 let idirtot = sol.idirtot(d.mes, d.dia, d.hora, d.rdir, d.rdifhor, d.salt,
                           d.latitud, surf.beta, surf.gamma);
 let idiftot = sol.idiftot(d.mes, d.dia, d.hora, d.rdir, d.rdifhor, d.salt,
                           d.latitud, surf.beta, surf.gamma, albedo);
 
-
-console.log('* Ejemplo CTE 2');
-console.log(d);
-console.log(data.meta);
+console.log('* Test CTE 2');
+console.log("Metadatos de clima: ", data.meta);
 console.log("Resultados para hora: ", d, " y superficie: ", surf);
 console.log(check('Irradiación directa + difusa horiz. (Mod. Pérez)',
                   idirtot + idiftot, d.rdirhor + d.rdifhor, 1));
 
-// TODO: sumar datos para todo el mes y calcular la media diaria mensual
-
 // Ejemplo 3
+console.log('* Test CTE 3');
+console.log("Dato calculado vs dato de .met hora a hora, para superficie ", surf, " y albedo ", albedo);
+let julylist = met.radiationForSurface(july_data, surf, albedo);
+let res = julylist.map(([rdir, rdif], i) => [july_data[i].rdirhor + july_data[i].rdifhor, rdir + rdif]);
+console.log(res);
+
+
+// Ejemplo 4
+console.log('* Test CTE 4');
+console.log("Acumulado mensual julio D3.met sup. horiz.");
+let [cumdir, cumdif] = met.cumulatedRadiation(julylist);
+console.log(`[kWh/m2/mes] - total: ${ (cumdir + cumdif).toFixed(2) }, directa: ${ cumdir.toFixed(2) }, difusa: ${ cumdif.toFixed(2) }`);
+console.log(`[kWh/m2/dia] - total: ${ ((cumdir + cumdif) / 31).toFixed(2) }, directa: ${ (cumdir / 31).toFixed(2) }, difusa: ${ (cumdif / 31).toFixed(2) }`);
+
 
 // Orientaciones
-const ORIENTATIONS = [
+const ORIENTACIONES = [
   // Area, slope, azimuth, name
   { Area: 1.0, beta: 0, gamma: 0, name: 'Horiz.' }, // horizontal
   { Area: 1.0, beta: 90, gamma: -135, name: 'NE' },
@@ -102,12 +100,22 @@ const ORIENTATIONS = [
   { Area: 1.0, beta: 90, gamma: 180, name: 'N' }
 ];
 
-console.log('* Ejemplo CTE 3');
-console.log(check('Declinación para 11 junio (delta)',
-                  declination, 23.0, 1));
+const MESES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+// Acumulado mensual por orientación
+{
+  let albedo = 0.2;
+  let data = climadata('zonaD3.met');
 
-// TODO
-
+  let surf = ORIENTACIONES[4];
+  let results = MESES.map(
+    imonth => {
+      let [cumdir, cumdif] = met.cumulatedRadiation(met.radiationForSurface(met.prepareData(data).filter(d => d.mes === imonth), surf, albedo));
+      return [surf, imonth, cumdir, cumdif];
+    }
+  );
+  results.map(([surf, imonth, cumdir, cumdif]) => console.log(`beta: ${ surf.beta }, orientación: ${ surf.name }. Radiación mes ${imonth} [kWh/m2/mes]: TOTAL:  ${ (cumdir + cumdif).toFixed(2) }, DIR.: ${ cumdir.toFixed(2) }, DIF.: ${ cumdif.toFixed(2) } `)
+)
+}
 
 // Ejemplo huecos para A_sol_ver
 //

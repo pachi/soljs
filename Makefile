@@ -8,6 +8,8 @@ buildjs:
 	npm run buildprod
 test:
 	node src/tests.js
+testcte:
+	node src/test_cte.js
 npminstall:
 	$(info [INFO]: Instalación de nodejs y dependencias JS)
 	curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
