@@ -79,51 +79,28 @@ function readmetfile(metpath) {
   return { meta, data };
 }
 
-
-// Añade datos climáticos adicionales
-//
-// Añade radiación a incidencia normal (rdir), altitud solar (salt) y latitud
-// también corrige el cénit solar para que no sea exactamente igual a 90.
-// TODO: ver si corregirmos el problema con la altitud solar en las ecuaciones
-//
-// data: datos climáticos tal como los devuelve readmetfile(datapath)
-function prepareData(data) {
-  return data.data
-    .map(
-      ({ mes, dia, hora, rdirhor, rdifhor, azimut, cenit }
-      ) => ({ mes, dia, hora, rdirhor, rdifhor, azimut, cenit }))
-    .map(e => {
-      e.cenit = (e.cenit !== 90) ? e.cenit : 89.5; // Corregir problema numérico con altitud solar = 0
-      e.salt = 90 - e.cenit;
-      e.latitud = data.meta.latitud;
-      e.rdir = sol.gsolbeam(e.rdirhor, e.salt);
-      return e;
-    });
-}
-
 // Calcula radiación directa y difusa en una superficie orientada y con albedo
 //
-// data: datos de localización y radiación sobre plano horizontal
+// latitude: latitud de la localización
+// hourlydata: datos climáticos horarios (.data de climadata)
 // surf: descripción de la superficie orientada (inclinación, azimuth)
 //       { beta: [0, 180], gamma: [-180, 180] }
 // albedo: reflectancia del entorno [0.0, 1.0]
-function radiationForSurface(data, surf, albedo) {
-  return data.map(
-    d => [sol.idirtot(d.mes, d.dia, d.hora, d.rdir, d.rdifhor, d.salt,
-                      d.latitud, surf.beta, surf.gamma),
-          sol.idiftot(d.mes, d.dia, d.hora, d.rdir, d.rdifhor, d.salt,
-                      d.latitud, surf.beta, surf.gamma, albedo)]);
-}
-
-// Radiación acumulada (p.e media mensual en kWh/m2/mes)
-//
-// radiationdata: lista de radiación directa y difusa [[rdir1, rdif1], ... [rdirn, rdifn]]
-// supone que son datos horarios (lista de radiación horaria)
-function cumulatedRadiation(radiationdata) {
-  let cum = radiationdata.reduce(([ardir, ardif], [brdir, brdif]) => [ardir + brdir, ardif + brdif], [0, 0]);
-  return [cum[0] / 1000, cum[1] / 1000];
+function radiationForSurface(latitude, hourlydata, surf, albedo) {
+  return hourlydata.map(
+    d => {
+      // Calcula altura solar = 90 - cenit y
+      // corregir problema numérico con altitud solar = 0
+      const salt = (d.cenit !== 90) ? 90 - d.cenit : 90 - 89.95;
+      const rdir = sol.gsolbeam(d.rdirhor, salt);
+      const dir = sol.idirtot(d.mes, d.dia, d.hora, rdir, d.rdifhor, salt,
+                              latitude, surf.beta, surf.gamma);
+      const dif = sol.idiftot(d.mes, d.dia, d.hora, rdir, d.rdifhor, salt,
+                              latitude, surf.beta, surf.gamma, albedo);
+      return { mes: d.mes, dia: d.dia, hora: d.hora, dir, dif, tot: dir + dif };
+    });
 }
 
 // ************************* Exports *****************************************
 
-module.exports = { readmetfile, prepareData, radiationForSurface, cumulatedRadiation };
+module.exports = { readmetfile, radiationForSurface };

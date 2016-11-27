@@ -53,9 +53,10 @@ console.log(check('Declinación para 11 junio (delta)',
                   declination, 23.0, 1));
 
 // Ejemplo 2
-let data = climadata('zonaD3.met');
+let metdata = climadata('zonaD3.met');
+let latitud = metdata.meta.latitud;
 
-let july_data = met.prepareData(data).filter(d => d.mes === 7);
+let july_data = metdata.data.filter(d => d.mes === 7);
 let surf = { Area: 1.0, beta: 0, gamma: 0, name: 'Horiz.' };
 let albedo = 0.2;
 let d = july_data[6];
@@ -65,7 +66,7 @@ let idiftot = sol.idiftot(d.mes, d.dia, d.hora, d.rdir, d.rdifhor, d.salt,
                           d.latitud, surf.beta, surf.gamma, albedo);
 
 console.log('* Test CTE 2');
-console.log("Metadatos de clima: ", data.meta);
+console.log("Metadatos de clima: ", metdata.meta);
 console.log("Resultados para hora: ", d, " y superficie: ", surf);
 console.log(check('Irradiación directa + difusa horiz. (Mod. Pérez)',
                   idirtot + idiftot, d.rdirhor + d.rdifhor, 1));
@@ -73,47 +74,63 @@ console.log(check('Irradiación directa + difusa horiz. (Mod. Pérez)',
 // Ejemplo 3
 console.log('* Test CTE 3');
 console.log("Dato calculado vs dato de .met hora a hora, para superficie ", surf, " y albedo ", albedo);
-let julylist = met.radiationForSurface(july_data, surf, albedo);
-let res = julylist.map(([rdir, rdif], i) => [july_data[i].rdirhor + july_data[i].rdifhor, rdir + rdif]);
-console.log(res);
-
+let julylist = met.radiationForSurface(latitud, july_data, surf, albedo);
+let tuples = julylist
+    .map(({ dir, dif }, i) =>
+         [july_data[i].rdirhor + july_data[i].rdifhor, dir + dif]);
+console.log(tuples);
 
 // Ejemplo 4
 console.log('* Test CTE 4');
 console.log("Acumulado mensual julio D3.met sup. horiz.");
-let [cumdir, cumdif] = met.cumulatedRadiation(julylist);
-console.log(`[kWh/m2/mes] - total: ${ (cumdir + cumdif).toFixed(2) }, directa: ${ cumdir.toFixed(2) }, difusa: ${ cumdif.toFixed(2) }`);
-console.log(`[kWh/m2/dia] - total: ${ ((cumdir + cumdif) / 31).toFixed(2) }, directa: ${ (cumdir / 31).toFixed(2) }, difusa: ${ (cumdif / 31).toFixed(2) }`);
+let cumdir = julylist.map(v => v.dir).reduce((a, b) => a + b, 0) / 1000;
+let cumdif = julylist.map(v => v.dif).reduce((a, b) => a + b, 0) / 1000;
+console.log(`[kWh/m2/mes] - total: ${ (cumdir + cumdif).toFixed(2) }, `
+            + `directa: ${ cumdir.toFixed(2) }, `
+            + `difusa: ${ cumdif.toFixed(2) }`);
+console.log(`[kWh/m2/dia] - total: ${ ((cumdir + cumdif) / 31).toFixed(2) }, `
+            + `directa: ${ (cumdir / 31).toFixed(2) }, `
+            + `difusa: ${ (cumdif / 31).toFixed(2) }`);
 
 
 // Orientaciones
 const ORIENTACIONES = [
   // Area, slope, azimuth, name
-  { Area: 1.0, beta: 0, gamma: 0, name: 'Horiz.' }, // horizontal
-  { Area: 1.0, beta: 90, gamma: -135, name: 'NE' },
-  { Area: 1.0, beta: 90, gamma: -90, name: 'E' },
-  { Area: 1.0, beta: 90, gamma: -45, name: 'SE' },
-  { Area: 1.0, beta: 90, gamma: 0, name: 'S' },
-  { Area: 1.0, beta: 90, gamma: 45, name: 'SW' },
-  { Area: 1.0, beta: 90, gamma: 90, name: 'W' },
-  { Area: 1.0, beta: 90, gamma: 135, name: 'NW' },
-  { Area: 1.0, beta: 90, gamma: 180, name: 'N' }
+  { beta: 0, gamma: 0, name: 'Horiz.' },
+  { beta: 90, gamma: -135, name: 'NE' },
+  { beta: 90, gamma: -90, name: 'E' },
+  { beta: 90, gamma: -45, name: 'SE' },
+  { beta: 90, gamma: 0, name: 'S' },
+  { beta: 90, gamma: 45, name: 'SW' },
+  { beta: 90, gamma: 90, name: 'W' },
+  { beta: 90, gamma: 135, name: 'NW' },
+  { beta: 90, gamma: 180, name: 'N' }
 ];
 
 const MESES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 // Acumulado mensual por orientación
 {
   let albedo = 0.2;
-  let data = climadata('zonaD3.met');
+  let metdata = climadata('zonaD3.met');
+  let latitud = metdata.meta.latitud;
 
   let surf = ORIENTACIONES[4];
+  let monthdata = met.radiationForSurface(latitud, metdata.data, surf, albedo);
+
   let results = MESES.map(
     imonth => {
-      let [cumdir, cumdif] = met.cumulatedRadiation(met.radiationForSurface(met.prepareData(data).filter(d => d.mes === imonth), surf, albedo));
-      return [surf, imonth, cumdir, cumdif];
+      let monthlist = monthdata.filter(d => d.mes === imonth);
+      let cumdir = monthlist.map(v => v.dir).reduce((a, b) => a + b);
+      let cumdif = monthlist.map(v => v.dif).reduce((a, b) => a + b);
+      return { imonth, surf, cumdir, cumdif };
     }
   );
-  results.map(([surf, imonth, cumdir, cumdif]) => console.log(`beta: ${ surf.beta }, orientación: ${ surf.name }. Radiación mes ${imonth} [kWh/m2/mes]: TOTAL:  ${ (cumdir + cumdif).toFixed(2) }, DIR.: ${ cumdir.toFixed(2) }, DIF.: ${ cumdif.toFixed(2) } `)
+  results.map(({ imonth, surf, cumdir, cumdif }) =>
+              console.log(`beta: ${ surf.beta }, orient.: ${ surf.name }. `
+                          + `Rad. mes ${ imonth } [kWh/m2/mes]: `
+                          + `TOTAL:  ${ ((cumdir + cumdif) / 1000).toFixed(2) }, `
+                          + `DIR.: ${ (cumdir / 1000).toFixed(2) }, `
+                          + `DIF.: ${ (cumdif / 1000).toFixed(2) } `)
 )
 }
 
