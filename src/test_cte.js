@@ -115,23 +115,23 @@ const MESES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   let latitud = metdata.meta.latitud;
 
   let surf = ORIENTACIONES[4];
-  let monthdata = met.radiationForSurface(latitud, metdata.data, surf, albedo);
 
-  let results = MESES.map(
-    imonth => {
-      let monthlist = monthdata.filter(d => d.mes === imonth);
-      let cumdir = monthlist.map(v => v.dir).reduce((a, b) => a + b);
-      let cumdif = monthlist.map(v => v.dif).reduce((a, b) => a + b);
-      return { imonth, surf, cumdir, cumdif };
-    }
-  );
+  let surfdata = met.radiationForSurface(latitud, metdata.data, surf, albedo);
+  let results = MESES.map(imonth => {
+    let monthlist = surfdata.filter(d => d.mes === imonth);
+    return { imonth,
+             surf,
+             cumdir: monthlist.map(v => v.dir).reduce((a, b) => a + b),
+             cumdif: monthlist.map(v => v.dif).reduce((a, b) => a + b) };
+  });
+
   results.map(({ imonth, surf, cumdir, cumdif }) =>
               console.log(`beta: ${ surf.beta }, orient.: ${ surf.name }. `
                           + `Rad. mes ${ imonth } [kWh/m2/mes]: `
                           + `TOTAL:  ${ ((cumdir + cumdif) / 1000).toFixed(2) }, `
                           + `DIR.: ${ (cumdir / 1000).toFixed(2) }, `
                           + `DIF.: ${ (cumdif / 1000).toFixed(2) } `)
-)
+             );
 }
 
 // Ejemplo huecos para A_sol_ver
