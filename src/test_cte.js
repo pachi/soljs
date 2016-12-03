@@ -22,7 +22,6 @@ SOFTWARE.
 */
 
 const path = require('path');
-const _ = require('lodash');
 const sol = require('./soljscte.js');
 const met = require('./met.js');
 
