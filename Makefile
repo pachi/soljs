@@ -8,6 +8,18 @@ testalt:
 	$(info [INFO]: Testing soljsalt.js)
 	node src/testalt.js
 
+patch:
+	npm version patch
+
+minor:
+	npm version minor
+
+major:
+	npm version major
+
+publish:
+	npm publish
+
 .PHONY: npminstall
 npminstall:
 	$(info [INFO]: Installing nodejs and other dependencies)
