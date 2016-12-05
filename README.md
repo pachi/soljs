@@ -5,3 +5,8 @@ Biblioteca de cálculos solares (posición y radiación) para uso en edificació
 
 Bilding science sun position and radiation library.
 
+## Instalación
+
+  npm install soljs --save
+
+

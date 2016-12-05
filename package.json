@@ -2,12 +2,15 @@
   "name": "soljs",
   "version": "0.1.0",
   "description": "SolJS Javascript implementation of solar radiation utilities for building science",
-  "author": "Rafael Villar Burke",
+  "author": "Rafael Villar Burke <pachi@rvburke.com> (http://www.rvburke.com)",
   "license": "MIT",
   "main": "src/soljs.js",
   "repository": {
       "type": "git",
       "url": "git+https://github.com/pachi/soljs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pachi/soljs/issues"
   },
   "scripts": {
     "test": "echo \"Testing soljs\" && node src/test.js",

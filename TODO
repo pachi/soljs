@@ -1,2 +1,4 @@
 - Completar implementación usando formulación de Duffie y Beckman en lugar de la ISO
+- Hacer tests con mocha y chai
+    ./node_modules/.bin/mocha --reporter spec
 
