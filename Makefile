@@ -1,18 +1,17 @@
-.PHONY: builddevjs
-builddevjs:
-	$(info [INFO]: Generando bundle JS para desarrollo)
-	npm run builddev
-.PHONY: buildjs
-buildjs:
-	$(info [INFO]: Generando bundle JS de producción)
-	npm run buildprod
+.PHONY: test
 test:
-	node src/tests.js
-testcte:
-	node src/test_cte.js
+	$(info [INFO]: Testing soljs.js)
+	node src/test.js
+
+.PHONY: test
+testalt:
+	$(info [INFO]: Testing soljsalt.js)
+	node src/testalt.js
+
+.PHONY: npminstall
 npminstall:
-	$(info [INFO]: Instalación de nodejs y dependencias JS)
+	$(info [INFO]: Installing nodejs and other dependencies)
 	curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 	sudo apt-get install -y nodejs
-	sudo npm install -g yarn eslint babel-eslint eslint-plugin-react http-server webpack webpack-dev-server
+	sudo npm install -g yarn eslint
 	yarn

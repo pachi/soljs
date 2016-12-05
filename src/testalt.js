@@ -1,4 +1,3 @@
-'use strict';
 /* -*- coding: utf-8 -*-
 
 Copyright (c) 2016 Rafael Villar Burke <pachi@rvburke.com>
@@ -22,9 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-const sol = require('./soljs.js');
-const _ = require('lodash');
-
+const sol = require('./soljsalt.js');
 const Wh2MJ = sol.Wh2MJ;
 
 // *********************** Examples **************************
@@ -237,7 +234,8 @@ console.log(check('Clear-sky total radiation on horizontal plane G_c = G_cb + G_
                   gcb282 + gcd282, 802.00));
 
 console.log("Hora \t taub \t Icbn \t Icb \t taud \t Icd \t Ic");
-_.range(0.5, 24.5)
+[ 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5,
+  13.5, 14.5, 15.5, 16.5, 17.5, 18.5, 19.5, 20.5, 21.5, 22.5, 23.5 ]
   .map(h => {
     let hangle = sol.hourAngle(h);
     return [h, sol.sunZenith(43, declination282, hangle)];
@@ -315,37 +313,3 @@ console.log(check('Daily diffuse to total radiation ratio',
 
 // Skip tests 2.13.1, 2.13.2, 2.13.3 on estimation of hourly radiation from daily data
 
-
-console.log('* CTE 1');
-console.log(check('Sunset hour angle for CTE_LATPENINSULA and July 17 (ws) [deg]',
-                  sol.CTE_WSPENINSULA, 109.5, 1));
-console.log(check('Daily diffuse to total radiation ratio H_d_mean / H_mean (ZC1, Peninsula)',
-                  sol.monthly_Id_to_I(sol.CTE_KTmean('1', false), sol.CTE_WSPENINSULA), 0.38, 2));
-console.log(check('Sunset hour angle for CTE_LATCANARIAS and July 17 (ws) [deg]',
-                  sol.CTE_WSCANARIAS, 102.0, 1));
-console.log(check('Daily diffuse to total radiation ratio H_d_mean / H_mean (ZC1, Canarias)',
-                  sol.monthly_Id_to_I(sol.CTE_KTmean('1', true), sol.CTE_WSCANARIAS), 0.38, 2));
-
-// Orientaciones
-const ORIENTATIONS = [
-  // Area, slope, azimuth, name
-  [1.0, 0, 0, '-'], // horizontal
-  [1.0, 90, -135, 'NE'],
-  [1.0, 90, -90, 'E'],
-  [1.0, 90, -45, 'SE'],
-  [1.0, 90, 0, 'S'],
-  [1.0, 90, 45, 'SW'],
-  [1.0, 90, 90, 'W'],
-  [1.0, 90, 135, 'NW'],
-  [1.0, 90, 180, 'N']
-];
-
-
-// Ejemplo huecos para A_sol_ver
-//
-const huecos = [
-  // n, Area, slope, azimuth, F_sh_mov
-  [1, 1.0, 90, 0, 1.0],
-  [2, 2.3 * 1.0, 90, 0, 0.1],
-  [1, 2.5 * 1.5, 90, 0, 0.1]
-];

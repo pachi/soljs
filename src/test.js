@@ -22,7 +22,7 @@ SOFTWARE.
 */
 
 const path = require('path');
-const sol = require('./soljscte.js');
+const sol = require('./soljs.js');
 const met = require('./met.js');
 
 const Wh2MJ = sol.Wh2MJ;

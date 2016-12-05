@@ -46,8 +46,8 @@ Línea 2: campos con datos de localización:
 - Cénit solar (grados).
 */
 
-const fs = require('fs'); //import * as fs from 'fs';
-const sol = require('./soljscte.js');
+const fs = require('fs');
+const sol = require('./soljs.js');
 
 // Compute primary energy (weighted energy) from data in filename
 function readmetfile(metpath) {

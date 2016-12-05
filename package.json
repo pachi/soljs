@@ -4,55 +4,22 @@
   "description": "SolJS Javascript implementation of solar radiation utilities for building science",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Testing soljs\" && node src/test.js",
+    "testalt": "echo \"Testing soljsalt\" && node src/testalt.js && node src/testaltcte.js",
     "clean": "rm -rf build/",
-    "buildprod": "NODE_ENV=production webpack --progress --colors -p",
-    "builddev": "NODE_ENV=development webpack --progress -d --colors --watch",
-    "webpack-server": "webpack-dev-server --hot --inline --colors",
-    "web-server": "http-server -p 3000 ./build",
-    "prodserver": "npm run web-server | npm run buildprod",
-    "lint": "eslint --ignore-pattern build/*.js --ext .js,.jsx src/",
-    "start": "npm run webpack-server",
-    "deploy": "NODE_ENV=production webpack -p"
+    "lint": "eslint --ignore-pattern build/*.js --ext .js src/"
   },
   "keywords": [
     "energy",
     "buildings",
     "CTE",
     "energía",
-    "edificios"
+    "edificios",
+    "solar",
+    "sun"
   ],
   "author": "Rafael Villar Burke",
   "license": "MIT",
-  "devDependencies": {
-    "autoprefixer": "^6.3.6",
-    "babel-core": "^6.10.4",
-    "babel-loader": "^6.2.4",
-    "babel-preset-es2015": "^6.9.0",
-    "babel-preset-react": "^6.5.0",
-    "babel-preset-stage-0": "^6.5.0",
-    "clean-webpack-plugin": "^0.1.8",
-    "css-loader": "^0.23.1",
-    "extract-text-webpack-plugin": "^1.0.1",
-    "file-loader": "^0.8.5",
-    "html-webpack-plugin": "^2.16.0",
-    "http-server": "^0.8.5",
-    "img-loader": "^1.2.2",
-    "imports-loader": "^0.6.5",
-    "node-libs-browser": "^1.0.0",
-    "node-sass": "^3.4.2",
-    "postcss-loader": "^0.8.2",
-    "react-hot-loader": "^1.3.0",
-    "resolve-url-loader": "^1.4.3",
-    "sass-loader": "^3.2.0",
-    "source-map-loader": "^0.1.5",
-    "style-loader": "^0.13.1",
-    "svgo-loader": "^1.1.0",
-    "url-loader": "^0.5.7",
-    "webpack": "^1.13.1",
-    "webpack-dev-server": "^1.14.1"
-  },
-  "dependencies": {
-    "lodash": "^4.11.2"
-  }
+  "devDependencies": {},
+  "dependencies": {}
 }
