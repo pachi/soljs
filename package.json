@@ -11,7 +11,7 @@
     "webpack-server": "webpack-dev-server --hot --inline --colors",
     "web-server": "http-server -p 3000 ./build",
     "prodserver": "npm run web-server | npm run buildprod",
-    "lint": "eslint --ignore-pattern build/*.js --ext .js,.jsx app/",
+    "lint": "eslint --ignore-pattern build/*.js --ext .js,.jsx src/",
     "start": "npm run webpack-server",
     "deploy": "NODE_ENV=production webpack -p"
   },
