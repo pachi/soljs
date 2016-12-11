@@ -58,7 +58,8 @@ function readmetfile(metpath) {
   const metname = datalines[0];
   const [latitud, longitud, altitud, longref] = datalines[1]
         .split(' ').map(parseFloat);
-  const meta = { metname, latitud, longitud, altitud, longref };
+  const zc = metname.replace(/^zona/,"").replace(/\.met$/, "");
+  const meta = { metname, zc, latitud, longitud, altitud, longref };
   // datalines
   let data = datalines.slice(2).map(x => x.split(/[\s,]+/).map(parseFloat));
   data = data.map(([ mes, dia, hora,
