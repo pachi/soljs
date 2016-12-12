@@ -49,9 +49,9 @@ Línea 2: campos con datos de localización:
 const fs = require('fs');
 const sol = require('./soljs.js');
 
-// Read hourly data from .met file in metpath
-function readmetfile(metpath) {
-  let datalines = fs.readFileSync(metpath, 'utf-8')
+// Parse hourly data from .met data as string
+function parsemet(metstring) {
+  let datalines = metstring
         .replace('\n\r', '\n').split('\n')
         .map(line => line.trim());
   // metadata
@@ -81,7 +81,11 @@ function readmetfile(metpath) {
   return { meta, data };
 }
 
-
+// Read hourly data from .met file in metpath
+function readmetfile(metpath) {
+  let datalines = fs.readFileSync(metpath, 'utf-8')
+  return parsemet(datalines);
+}
 
 // Calcula radiación directa y difusa en una superficie orientada y con albedo
 //
