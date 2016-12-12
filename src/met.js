@@ -49,7 +49,7 @@ Línea 2: campos con datos de localización:
 const fs = require('fs');
 const sol = require('./soljs.js');
 
-// Compute primary energy (weighted energy) from data in filename
+// Read hourly data from .met file in metpath
 function readmetfile(metpath) {
   let datalines = fs.readFileSync(metpath, 'utf-8')
         .replace('\n\r', '\n').split('\n')
@@ -62,6 +62,7 @@ function readmetfile(metpath) {
   const meta = { metname, zc, latitud, longitud, altitud, longref };
   // datalines
   let data = datalines.slice(2).map(x => x.split(/[\s,]+/).map(parseFloat));
+  // TODO: filter empty lines
   data = data.map(([ mes, dia, hora,
                      tempseca, tempcielo,
                      rdirhor, rdifhor,
@@ -79,6 +80,8 @@ function readmetfile(metpath) {
 
   return { meta, data };
 }
+
+
 
 // Calcula radiación directa y difusa en una superficie orientada y con albedo
 //
