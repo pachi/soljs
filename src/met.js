@@ -46,8 +46,6 @@ Línea 2: campos con datos de localización:
 - Cénit solar (grados).
 */
 
-const sol = require('./soljs.js');
-
 // Parse hourly data from .met data as string
 function parsemet(metstring) {
   let datalines = metstring
@@ -80,28 +78,6 @@ function parsemet(metstring) {
   return { meta, data };
 }
 
-// Calcula radiación directa y difusa en una superficie orientada y con albedo
-//
-// latitude: latitud de la localización
-// hourlydata: datos climáticos horarios (.data de climadata)
-// surf: descripción de la superficie orientada (inclinación, azimuth)
-//       { beta: [0, 180], gamma: [-180, 180] }
-// albedo: reflectancia del entorno [0.0, 1.0]
-function radiationForSurface(latitude, surf, albedo, hourlydata) {
-  return hourlydata.map(
-    d => {
-      // Calcula altura solar = 90 - cenit y
-      // corregir problema numérico con altitud solar = 0
-      const salt = (d.cenit !== 90) ? 90 - d.cenit : 90 - 89.95;
-      const rdir = sol.gsolbeam(d.rdirhor, salt);
-      const dir = sol.idirtot(d.mes, d.dia, d.hora, rdir, d.rdifhor, salt,
-                              latitude, surf.beta, surf.gamma);
-      const dif = sol.idiftot(d.mes, d.dia, d.hora, rdir, d.rdifhor, salt,
-                              latitude, surf.beta, surf.gamma, albedo);
-      return { mes: d.mes, dia: d.dia, hora: d.hora, dir, dif, tot: dir + dif };
-    });
-}
-
 // ************************* Exports *****************************************
 
-module.exports = { parsemet, radiationForSurface };
+module.exports = { parsemet };

@@ -38,6 +38,28 @@ function climadata(metfile) {
   return met.parsemet(datalines);
 }
 
+// Calcula radiación directa y difusa en una superficie orientada y con albedo
+//
+// latitude: latitud de la localización
+// hourlydata: datos climáticos horarios (.data de climadata)
+// surf: descripción de la superficie orientada (inclinación, azimuth)
+//       { beta: [0, 180], gamma: [-180, 180] }
+// albedo: reflectancia del entorno [0.0, 1.0]
+function radiationForSurface(latitude, surf, albedo, hourlydata) {
+  return hourlydata.map(
+    d => {
+      // Calcula altura solar = 90 - cenit y
+      // corregir problema numérico con altitud solar = 0
+      const salt = (d.cenit !== 90) ? 90 - d.cenit : 90 - 89.95;
+      const rdir = sol.gsolbeam(d.rdirhor, salt);
+      const dir = sol.idirtot(d.mes, d.dia, d.hora, rdir, d.rdifhor, salt,
+                              latitude, surf.beta, surf.gamma);
+      const dif = sol.idiftot(d.mes, d.dia, d.hora, rdir, d.rdifhor, salt,
+                              latitude, surf.beta, surf.gamma, albedo);
+      return { mes: d.mes, dia: d.dia, hora: d.hora, dir, dif, tot: dir + dif };
+    });
+}
+
 // *********************** Examples **************************
 function check(msg, value, expected, precision) {
   const prec = precision !== undefined ? precision : 2;
@@ -76,7 +98,7 @@ console.log(check('Irradiación directa + difusa horiz. (Mod. Pérez)',
 // Ejemplo 3
 console.log('* Test CTE 3');
 console.log("Dato calculado vs dato de .met hora a hora, para superficie ", surf, " y albedo ", albedo);
-let julylist = met.radiationForSurface(latitud, surf, albedo, july_data);
+let julylist = radiationForSurface(latitud, surf, albedo, july_data);
 let tuples = julylist
     .map(({ dir, dif }, i) =>
          [july_data[i].rdirhor + july_data[i].rdifhor, dir + dif]);
@@ -118,7 +140,7 @@ const MESES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
   let surf = ORIENTACIONES[4];
 
-  let surfdata = met.radiationForSurface(latitud, surf, albedo, metdata.data);
+  let surfdata = radiationForSurface(latitud, surf, albedo, metdata.data);
   let results = MESES.map(imonth => {
     let monthlist = surfdata.filter(d => d.mes === imonth);
     return { imonth,

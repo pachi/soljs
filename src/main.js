@@ -28,7 +28,4 @@ Authors: Rafael Villar Burke <pachi@rvburke.com>
 const soljs = require('./soljs.js');
 const met = require('./met.js');
 
-module.exports = {
-  soljs,
-  met
-};
+module.exports = { soljs, met };
