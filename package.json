@@ -1,6 +1,6 @@
 {
   "name": "soljs",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "SolJS Javascript implementation of solar radiation utilities for building science",
   "author": "Rafael Villar Burke <pachi@rvburke.com> (http://www.rvburke.com)",
   "license": "MIT",
