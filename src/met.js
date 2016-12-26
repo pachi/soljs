@@ -57,8 +57,9 @@ const CLIMATEZONES = [
 // Parse hourly data from .met data as string
 function parsemet(metstring) {
   let datalines = metstring
-        .replace('\n\r', '\n').split('\n')
-        .map(line => line.trim());
+      .replace('\n\r', '\n').split('\n')
+      .map(line => line.trim())
+      .filter(line => line !== '');
   // metadata
   const metname = datalines[0];
   const [latitud, longitud, altitud, longref] = datalines[1]
