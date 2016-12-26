@@ -21,9 +21,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+const fs = require('fs');
 const path = require('path');
-const sol = require('./soljs.js');
+
 const met = require('./met.js');
+const sol = require('./soljs.js');
 
 const Wh2MJ = sol.Wh2MJ;
 
@@ -31,8 +33,9 @@ const Wh2MJ = sol.Wh2MJ;
 
 // Lee datos climáticos desde archivo .met
 function climadata(metfile) {
-  const datapath = path.resolve(__dirname, metfile);
-  return met.readmetfile(datapath);
+  const metpath = path.resolve(__dirname, metfile);
+  let datalines = fs.readFileSync(metpath, 'utf-8');
+  return met.parsemet(datalines);
 }
 
 // *********************** Examples **************************
@@ -73,7 +76,7 @@ console.log(check('Irradiación directa + difusa horiz. (Mod. Pérez)',
 // Ejemplo 3
 console.log('* Test CTE 3');
 console.log("Dato calculado vs dato de .met hora a hora, para superficie ", surf, " y albedo ", albedo);
-let julylist = met.radiationForSurface(latitud, july_data, surf, albedo);
+let julylist = met.radiationForSurface(latitud, surf, albedo, july_data);
 let tuples = julylist
     .map(({ dir, dif }, i) =>
          [july_data[i].rdirhor + july_data[i].rdifhor, dir + dif]);
@@ -115,7 +118,7 @@ const MESES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
   let surf = ORIENTACIONES[4];
 
-  let surfdata = met.radiationForSurface(latitud, metdata.data, surf, albedo);
+  let surfdata = met.radiationForSurface(latitud, surf, albedo, metdata.data);
   let results = MESES.map(imonth => {
     let monthlist = surfdata.filter(d => d.mes === imonth);
     return { imonth,
