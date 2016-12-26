@@ -132,29 +132,36 @@ const ORIENTACIONES = [
 ];
 
 const MESES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+
+// Acumulados mensuales para el clima y la superficie dados
+function monthlyRadiationForSurface(metdata, surf, albedo) {
+  const latitud = metdata.meta.latitud;
+  const data = metdata.data;
+  //console.log('Data: ', mobx.toJS(data));
+  const surfRadiation = radiationForSurface(latitud, surf, albedo, data);
+  //console.log('Data: ', mobx.toJS(surfRadiation));
+  return MESES.map(imes => {
+    let monthRadiation = surfRadiation.filter(d => d.mes === imes);
+    return { imes,
+             surf,
+             dir: monthRadiation.map(v => v.dir).reduce((a, b) => a + b),
+             dif: monthRadiation.map(v => v.dif).reduce((a, b) => a + b) };
+  });
+}
+
 // Acumulado mensual por orientación
 {
   let albedo = 0.2;
   let metdata = climadata('zonaD3.met');
-  let latitud = metdata.meta.latitud;
-
   let surf = ORIENTACIONES[4];
-
-  let surfdata = radiationForSurface(latitud, surf, albedo, metdata.data);
-  let results = MESES.map(imonth => {
-    let monthlist = surfdata.filter(d => d.mes === imonth);
-    return { imonth,
-             surf,
-             cumdir: monthlist.map(v => v.dir).reduce((a, b) => a + b),
-             cumdif: monthlist.map(v => v.dif).reduce((a, b) => a + b) };
-  });
-
-  results.map(({ imonth, surf, cumdir, cumdif }) =>
+  let results = monthlyRadiationForSurface(metdata, surf, albedo);
+  results.map(({ imes, surf, dir, dif }) =>
               console.log(`beta: ${ surf.beta }, orient.: ${ surf.name }. `
-                          + `Rad. mes ${ imonth } [kWh/m2/mes]: `
-                          + `TOTAL:  ${ ((cumdir + cumdif) / 1000).toFixed(2) }, `
-                          + `DIR.: ${ (cumdir / 1000).toFixed(2) }, `
-                          + `DIF.: ${ (cumdif / 1000).toFixed(2) } `)
+                          + `Rad. mes ${ imes } [kWh/m2/mes]: `
+                          + `TOTAL:  ${ ((dir + dif) / 1000).toFixed(2) }, `
+                          + `DIR.: ${ (dir / 1000).toFixed(2) }, `
+                          + `DIF.: ${ (dif / 1000).toFixed(2) } `)
              );
 }
 
