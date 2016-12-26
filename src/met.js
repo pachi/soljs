@@ -88,4 +88,4 @@ function parsemet(metstring) {
 
 // ************************* Exports *****************************************
 
-module.exports = { ZONESLIST, parsemet };
+module.exports = { CLIMATEZONES, parsemet };
