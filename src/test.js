@@ -165,13 +165,3 @@ function monthlyRadiationForSurface(metdata, surf, albedo) {
              );
 }
 
-// Ejemplo huecos para A_sol_ver
-//
-const huecos = [
-  // n, Area, slope, azimuth, F_sh_mov
-  [1, 1.0, 90, 0, 1.0],
-  [2, 2.3 * 1.0, 90, 0, 0.1],
-  [1, 2.5 * 1.5, 90, 0, 0.1]
-];
-
-// TODO
