@@ -46,9 +46,9 @@ function acosd(rcos) { return TO_DEG * Math.acos(rcos); }
 
 // Number of day for given date [1, 365/366]
 // isodatestring: date string in iso format, e.g. "2016-12-23"
-function ndayfromdate(isodatestring) {
-  const now = new Date(isodatestring);
-  const start = new Date(now.getFullYear(), 0, 0);
+function ndayfromdate(year, month, day) {
+  const now = new Date(year, month, day);
+  const start = new Date(year, 0, 0);
   const oneDay = 1000 * 60 * 60 * 24; // miliseconds in day
   return Math.floor((now - start) / oneDay);
 }
@@ -366,7 +366,7 @@ function icircum(nday, gsolbeam, gsoldiff, salt, sangle) {
 // gamma: surface orientation (deviation from south, E+, W-), degrees [-180, 180]
 function idirtot(month, day, hour, gsolbeam, gsoldiff, saltitude,
                  wlat, beta, gamma) {
-  const nday = ndayfromdate(`2001-${ month }-${ day }`);
+  const nday = ndayfromdate(2001, month, day);
   const delta = declination(nday);
   const hangle = hourangle(hour);
   // sangle: surface incidence angle
@@ -394,7 +394,7 @@ function idirtot(month, day, hour, gsolbeam, gsoldiff, saltitude,
 // albedo: solar reflectivity of the ground [0.0, 1.0]
 function idiftot(month, day, hour, gsolbeam, gsoldiff, saltitude,
                  wlat, beta, gamma, albedo) {
-  const nday = ndayfromdate(`2001-${ month }-${ day }`);
+  const nday = ndayfromdate(2001, month, day);
   const delta = declination(nday);
   const hangle = hourangle(hour);
   const sangle = sangleforsurf(delta, hangle, wlat, beta, gamma);
