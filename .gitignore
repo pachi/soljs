@@ -1,7 +1,8 @@
-node_modules
-bower_components
-dist
-build
+/node_modules/
+/bower_components/
+/dist/
+/build/
+/lib/
 stats.json
 *.log
 *.generated.*
