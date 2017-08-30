@@ -70,59 +70,72 @@ function check(msg, value, expected, precision) {
   return `${ msg } = ${ value.toFixed(prec) } ${ res }`;
 }
 
+// Valores generales
+const surf = { Area: 1.0, beta: 0, gamma: 0, name: 'Horiz.' };
+const albedo = 0.2;
+const maxdif = 2; // diferencia máxima en valores
+const climafile = 'zonaD3.met';
+const metdata = climadata('zonaD3.met');
+const latitud = metdata.meta.latitud;
+const july_data = metdata.data.filter(d => d.mes === 7);
+const julylist = radiationForSurface(latitud, surf, albedo, july_data);
+
 // Ejemplo 1
-const nday = sol.ndayfromdatestring('2001-6-11');
-const declination = sol.declination(nday);
-
-console.log('* Test CTE 1');
-console.log(check(`Declinación para 11 junio (delta) nday=(${ nday } )`,
-                  declination, 23.0, 1));
-
+{
+  console.log('* Test CTE 1');
+  const nday = sol.ndayfromdatestring('2001-6-11');
+  const declination = sol.declination(nday);
+  console.log(check(`Declinación para 11 junio (delta) nday=(${ nday } )`,
+                    declination, 23.0, 1));
+  console.log("--------------------------------------");
+}
 // Ejemplo 2
-let metdata = climadata('zonaD3.met');
-let latitud = metdata.meta.latitud;
-
-let july_data = metdata.data.filter(d => d.mes === 7);
-let surf = { Area: 1.0, beta: 0, gamma: 0, name: 'Horiz.' };
-let albedo = 0.2;
-let d = july_data[6];
-let saltj6 = 90 - d.cenit;
-let rdirj6 = sol.gsolbeam(d.rdirhor, saltj6);
-let idirtot = sol.idirtot(d.mes, d.dia, d.hora, rdirj6, d.rdifhor, saltj6,
-                          latitud, surf.beta, surf.gamma);
-let idiftot = sol.idiftot(d.mes, d.dia, d.hora, rdirj6, d.rdifhor, saltj6,
-                          latitud, surf.beta, surf.gamma, albedo);
-
-console.log('* Test CTE 2');
-console.log("Metadatos de clima: ", metdata.meta);
-console.log("Resultados para hora: ", d, " y superficie: ", surf);
-console.log(idirtot, idiftot);
-console.log(check('Irradiación directa + difusa horiz. (Mod. Pérez)',
-                  idirtot + idiftot, d.rdirhor + d.rdifhor, 0));
+{
+  console.log('* Test CTE 2');
+  let d = july_data[6];
+  let saltj6 = 90 - d.cenit;
+  let rdirj6 = sol.gsolbeam(d.rdirhor, saltj6);
+  let idirtot = sol.idirtot(d.mes, d.dia, d.hora, rdirj6, d.rdifhor, saltj6,
+                            latitud, surf.beta, surf.gamma);
+  let idiftot = sol.idiftot(d.mes, d.dia, d.hora, rdirj6, d.rdifhor, saltj6,
+                            latitud, surf.beta, surf.gamma, albedo);
+  console.log("Metadatos de clima: ", metdata.meta);
+  console.log("Resultados para hora: ", d, " y superficie: ", surf);
+  console.log(idirtot, idiftot);
+  console.log(check('Irradiación directa + difusa horiz. (Mod. Pérez)',
+                    idirtot + idiftot, d.rdirhor + d.rdifhor, 0));
+  console.log("--------------------------------------");
+}
 
 // Ejemplo 3
-const maxdif = 2;
-console.log('* Test CTE 3');
-console.log("Dato calculado vs dato de .met hora a hora, para superficie ", surf, " y albedo ", albedo);
-console.log("Valores con más de ", maxdif, " W/m2 de diferencia");
-let julylist = radiationForSurface(latitud, surf, albedo, july_data);
-let tuples = julylist
+{
+  console.log('* Test CTE 3');
+  console.log("Dato calculado vs dato de .met hora a hora, para superficie ", surf, " y albedo ", albedo);
+  console.log("Valores con más de ", maxdif, " W/m2 de diferencia");
+  let tuples = julylist
     .map(({ dir, dif }, i) =>
          [july_data[i].rdirhor + july_data[i].rdifhor, myround(dir + dif, 2).toFixed(2)])
     .filter(([metval, calcval]) => Math.abs(metval - calcval) > maxdif);
-console.log(tuples);
+  console.log(tuples);
+  console.log("--------------------------------------");
+}
 
 // Ejemplo 4
-console.log('* Test CTE 4');
-console.log("Acumulado mensual calculado para julio D3.met sup. horiz.");
-let cumdir = julylist.map(v => v.dir).reduce((a, b) => a + b, 0) / 1000;
-let cumdif = julylist.map(v => v.dif).reduce((a, b) => a + b, 0) / 1000;
-console.log(`[kWh/m2/mes] - total: ${ (cumdir + cumdif).toFixed(2) }, `
-            + `directa: ${ cumdir.toFixed(2) }, `
-            + `difusa: ${ cumdif.toFixed(2) }`);
-console.log(`[kWh/m2/dia] - total: ${ ((cumdir + cumdif) / 31).toFixed(2) }, `
-            + `directa: ${ (cumdir / 31).toFixed(2) }, `
-            + `difusa: ${ (cumdif / 31).toFixed(2) }`);
+{
+  console.log('* Test CTE 4');
+  console.log("Acumulado mensual calculado para julio D3.met sup. horiz.");
+  let cumdir = julylist.map(v => v.dir).reduce((a, b) => a + b, 0) / 1000;
+  let cumdif = julylist.map(v => v.dif).reduce((a, b) => a + b, 0) / 1000;
+  console.log(`[kWh/m2/mes] - total: ${ (cumdir + cumdif).toFixed(2) }, `
+              + `directa: ${ cumdir.toFixed(2) }, `
+              + `difusa: ${ cumdif.toFixed(2) }`);
+  console.log(`[kWh/m2/dia] - total: ${ ((cumdir + cumdif) / 31).toFixed(2) }, `
+              + `directa: ${ (cumdir / 31).toFixed(2) }, `
+              + `difusa: ${ (cumdif / 31).toFixed(2) }`);
+  console.log("--------------------------------------");
+}
+
+// Test consistencia MET vs soljs
 
 
 // Orientaciones
@@ -160,16 +173,14 @@ function monthlyRadiationForSurface(metdata, surf, albedo) {
 
 // Acumulado mensual por orientación
 {
-  let albedo = 0.2;
-  let metdata = climadata('zonaD3.met');
-  let surf = ORIENTACIONES[4];
-  let results = monthlyRadiationForSurface(metdata, surf, albedo);
+  const mysurf = ORIENTACIONES[4];
+  console.log("* Datos para superficie: ", mysurf);
+  let results = monthlyRadiationForSurface(metdata, mysurf, albedo);
   results.map(({ imes, surf, dir, dif }) =>
-              console.log(`beta: ${ surf.beta }, orient.: ${ surf.name }. `
+              console.log(`\tbeta: ${ surf.beta }, orient.: ${ surf.name }. `
                           + `Rad. mes ${ imes } [kWh/m2/mes]: `
                           + `TOTAL:  ${ ((dir + dif) / 1000).toFixed(2) }, `
                           + `DIR.: ${ (dir / 1000).toFixed(2) }, `
                           + `DIF.: ${ (dif / 1000).toFixed(2) } `)
              );
 }
-
