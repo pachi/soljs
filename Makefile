@@ -25,5 +25,5 @@ npminstall:
 	$(info [INFO]: Installing nodejs and other dependencies)
 	curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 	sudo apt-get install -y nodejs
-	sudo npm install -g yarn eslint
-	yarn
+	sudo npm install -g eslint
+	npm install
