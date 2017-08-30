@@ -240,7 +240,7 @@ function airmass(salt) {
 // gsolhor: solar direct irradiance on an horizontal plane, W/m2
 // salt: solar altitude, degrees
 function gsolbeam(gsolhor, salt) {
-  return gsolhor / sind(salt);
+  return (Math.abs(salt) < 1e-3) ? 0 : gsolhor / sind(salt);
 }
 
 // Direct irradiance on inclined surface (I_dir) -> W/m2
