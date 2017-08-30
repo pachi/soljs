@@ -45,9 +45,12 @@ function acosd(rcos) { return TO_DEG * Math.acos(rcos); }
 // function atand(rtan) { return TO_DEG * Math.atan(rtan); }
 
 // Number of day for given date [1, 365/366]
-// isodatestring: date string in iso format, e.g. "2016-12-23"
+// year: number of year 1-
+// month: 1-12
+// day: day of month 1-31
 function ndayfromdate(year, month, day) {
-  const now = new Date(year, month, day);
+  // Month is 0 based!!!!!
+  const now = new Date(year, month - 1, day);
   const start = new Date(year, 0, 0);
   const oneDay = 1000 * 60 * 60 * 24; // miliseconds in day
   return Math.floor((now - start) / oneDay);
