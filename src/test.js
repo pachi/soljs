@@ -114,7 +114,7 @@ console.log(tuples);
 
 // Ejemplo 4
 console.log('* Test CTE 4');
-console.log("Acumulado mensual julio D3.met sup. horiz.");
+console.log("Acumulado mensual calculado para julio D3.met sup. horiz.");
 let cumdir = julylist.map(v => v.dir).reduce((a, b) => a + b, 0) / 1000;
 let cumdif = julylist.map(v => v.dif).reduce((a, b) => a + b, 0) / 1000;
 console.log(`[kWh/m2/mes] - total: ${ (cumdir + cumdif).toFixed(2) }, `
