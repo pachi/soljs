@@ -101,12 +101,15 @@ console.log(check('Irradiación directa + difusa horiz. (Mod. Pérez)',
                   idirtot + idiftot, d.rdirhor + d.rdifhor, 0));
 
 // Ejemplo 3
+const maxdif = 2;
 console.log('* Test CTE 3');
 console.log("Dato calculado vs dato de .met hora a hora, para superficie ", surf, " y albedo ", albedo);
+console.log("Valores con más de ", maxdif, " W/m2 de diferencia");
 let julylist = radiationForSurface(latitud, surf, albedo, july_data);
 let tuples = julylist
     .map(({ dir, dif }, i) =>
-         [july_data[i].rdirhor + july_data[i].rdifhor, dir + dif]);
+         [july_data[i].rdirhor + july_data[i].rdifhor, myround(dir + dif, 2).toFixed(2)])
+    .filter(([metval, calcval]) => Math.abs(metval - calcval) > maxdif);
 console.log(tuples);
 
 // Ejemplo 4
