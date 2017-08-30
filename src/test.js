@@ -52,7 +52,7 @@ function radiationForSurface(latitude, surf, albedo, hourlydata) {
     d => {
       // Calcula altura solar = 90 - cenit y
       // corregir problema numérico con altitud solar = 0
-      const salt = (d.cenit !== 90) ? 90 - d.cenit : 90 - 89.95;
+      const salt = 90 - d.cenit;
       const rdir = sol.gsolbeam(d.rdirhor, salt);
       const dir = sol.idirtot(d.mes, d.dia, d.hora, rdir, d.rdifhor, salt,
                               latitude, surf.beta, surf.gamma);
