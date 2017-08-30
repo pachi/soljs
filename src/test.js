@@ -136,7 +136,36 @@ const julylist = radiationForSurface(latitud, surf, albedo, july_data);
 }
 
 // Test consistencia MET vs soljs
+{
+  console.log('* Test CTE 5');
+  console.log('   Consistencia radiación total en .met vs soljs en plano horizontal');
+  console.log("   Dato calculado vs dato de .met (", climafile, ") ");
+  console.log("   Acumulados hora a hora, para superficie ", surf, " y albedo ", albedo);
+  const meses = [...new Set(metdata.data.map(e => e.mes))];
+  const radlist = radiationForSurface(metdata.meta.latitud, surf, albedo, metdata.data);
+  const tuples = radlist
+      .map(({ dir, dif }, i) => ({
+        i,
+        mes: metdata.data[i].mes,
+        met: metdata.data[i].rdirhor + metdata.data[i].rdifhor,
+        soljs: myround(dir + dif)
+      }));
+  const acumula = list => list.reduce(
+          (acc, el) => ({
+            met: acc.met + el.met,
+            soljs: acc.soljs + el.soljs
+          }),
+          { met: 0, soljs: 0 }
+          );
+  meses.map(m => {
+          const cum = acumula(tuples.filter(e => e.mes === m));
+          console.log("\tMes ", m, "- r_tot_met: ", cum.met, " , r_tot_soljs: ", (cum.soljs).toFixed(2));
+  });
 
+  const totanual = acumula(tuples);
+  console.log("Total anual - r_tot_met: ", totanual.met, " , r_tot_soljs: ", (totanual.soljs).toFixed(2));
+  console.log("--------------------------------------");
+}
 
 // Orientaciones
 const ORIENTACIONES = [
