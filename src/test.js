@@ -38,6 +38,8 @@ function climadata(metfile) {
   return met.parsemet(datalines);
 }
 
+const myround = (num, ndigits = 2) => Math.round(num * Math.pow(10, ndigits)) / Math.pow(10, ndigits);
+
 // Calcula radiación directa y difusa en una superficie orientada y con albedo
 //
 // latitude: latitud de la localización
