@@ -53,6 +53,14 @@ function ndayfromdate(year, month, day) {
   return Math.floor((now - start) / oneDay);
 }
 
+// Number of day for given date [1, 365/366]
+// isodatestring: date string in iso format, e.g. "2016-12-23"
+function ndayfromdatestring(isodatestring) {
+  const now = new Date(isodatestring);
+  const start = new Date(now.getFullYear(), 0, 0);
+  const oneDay = 1000 * 60 * 60 * 24; // miliseconds in day
+  return Math.floor((now - start) / oneDay);
+}
 // ******************* Solar position functions **********************
 
 
@@ -446,7 +454,7 @@ function CTE_latitude(location) {
 // ************************* Exports *****************************************
 
 module.exports = { G_SC, TO_RAD, TO_DEG, Wh2MJ,
-                   ndayfromdate, declination, teq, tshift, tsol, hourangle,
+                   ndayfromdate, ndayfromdatestring, declination, teq, tshift, tsol, hourangle,
                    saltitude, saltfromzenith, szenithfromalt, sazimuth,
                    sangleforsurf, sgammaforsurf, sbetaforsurf, airmass, gsolbeam,
                    idir, iext, idif, idifgrnd, icircum, idirtot, idiftot, itot,
