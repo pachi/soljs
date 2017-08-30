@@ -71,11 +71,11 @@ function check(msg, value, expected, precision) {
 }
 
 // Ejemplo 1
-const nday = sol.ndayfromdate('2001-6-11');
+const nday = sol.ndayfromdatestring('2001-6-11');
 const declination = sol.declination(nday);
 
 console.log('* Test CTE 1');
-console.log(check('Declinación para 11 junio (delta)',
+console.log(check(`Declinación para 11 junio (delta) nday=(${ nday } )`,
                   declination, 23.0, 1));
 
 // Ejemplo 2
