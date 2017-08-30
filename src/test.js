@@ -86,16 +86,19 @@ let july_data = metdata.data.filter(d => d.mes === 7);
 let surf = { Area: 1.0, beta: 0, gamma: 0, name: 'Horiz.' };
 let albedo = 0.2;
 let d = july_data[6];
-let idirtot = sol.idirtot(d.mes, d.dia, d.hora, d.rdir, d.rdifhor, d.salt,
-                          d.latitud, surf.beta, surf.gamma);
-let idiftot = sol.idiftot(d.mes, d.dia, d.hora, d.rdir, d.rdifhor, d.salt,
-                          d.latitud, surf.beta, surf.gamma, albedo);
+let saltj6 = 90 - d.cenit;
+let rdirj6 = sol.gsolbeam(d.rdirhor, saltj6);
+let idirtot = sol.idirtot(d.mes, d.dia, d.hora, rdirj6, d.rdifhor, saltj6,
+                          latitud, surf.beta, surf.gamma);
+let idiftot = sol.idiftot(d.mes, d.dia, d.hora, rdirj6, d.rdifhor, saltj6,
+                          latitud, surf.beta, surf.gamma, albedo);
 
 console.log('* Test CTE 2');
 console.log("Metadatos de clima: ", metdata.meta);
 console.log("Resultados para hora: ", d, " y superficie: ", surf);
+console.log(idirtot, idiftot);
 console.log(check('Irradiación directa + difusa horiz. (Mod. Pérez)',
-                  idirtot + idiftot, d.rdirhor + d.rdifhor, 1));
+                  idirtot + idiftot, d.rdirhor + d.rdifhor, 0));
 
 // Ejemplo 3
 console.log('* Test CTE 3');
