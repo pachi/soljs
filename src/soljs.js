@@ -415,7 +415,7 @@ function idiftot(month, day, hour, gsolbeam, gsoldiff, saltitude,
   const idifval = idif(nday, gsolbeam, gsoldiff, saltitude, sangle, beta);
   const icircumval = icircum(nday, gsolbeam, gsoldiff, saltitude, sangle);
   const idifgrndval = idifgrnd(gsolbeam, gsoldiff, saltitude, beta, albedo);
-  const idiftotval = idifval - icircumval - idifgrndval;
+  const idiftotval = idifval - icircumval + idifgrndval;
   return idiftotval;
 }
 
