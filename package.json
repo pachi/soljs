@@ -18,7 +18,7 @@
     "test": "echo \"Testing soljs\" && node src/test.js",
     "test:watch": "watch 'npm run test' ./src",
     "testalt": "echo \"Testing soljsalt\" && node src/testalt.js && node src/testaltcte.js",
-    "clean": "rm -rf lib/",
+    "clean": "rimraf lib/*",
     "lint": "eslint --ignore-pattern lib/*.js --ext .js src/"
   },
   "keywords": [
